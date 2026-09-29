@@ -20,12 +20,18 @@ export default function HomeScreen() {
         </Text>
 
         {__DEV__ ? (
-          <View style={{ marginTop: spacing.xxl }}>
+          <View style={{ marginTop: spacing.xxl, gap: spacing.md }}>
             <Button
               label="🎨 Bileşen Galerisi"
               variant="secondary"
               onPress={() => router.push('/__dev/components')}
               accessibilityLabel="Geliştirici bileşen galerisi"
+            />
+            <Button
+              label="🗄️ DB Testleri"
+              variant="secondary"
+              onPress={() => router.push('/__dev/db')}
+              accessibilityLabel="Geliştirici veritabanı testleri"
             />
           </View>
         ) : null}

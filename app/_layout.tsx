@@ -5,6 +5,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { ThemeProvider } from '@/theme';
 import { useFonts } from '@/lib/useFonts';
 import { Colors } from '@/theme/tokens';
+import { DbProvider } from '@/db/DbProvider';
 
 export default function RootLayout() {
   const { fontsLoaded, fontError } = useFonts();
@@ -16,10 +17,12 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <ThemeProvider variant="playful">
-        <Stack screenOptions={{ headerShown: false }} />
-        <StatusBar style="dark" />
-      </ThemeProvider>
+      <DbProvider>
+        <ThemeProvider variant="playful">
+          <Stack screenOptions={{ headerShown: false }} />
+          <StatusBar style="dark" />
+        </ThemeProvider>
+      </DbProvider>
     </GestureHandlerRootView>
   );
 }

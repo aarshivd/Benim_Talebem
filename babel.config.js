@@ -16,6 +16,8 @@ module.exports = function (api) {
           },
         },
       ],
+      // Drizzle migration .sql dosyalarını inline import için
+      ['inline-import', { extensions: ['.sql'] }],
       // react-native-reanimated/plugin test ortamında çalışmaz
       ...(isTest ? [] : ['react-native-reanimated/plugin']),
     ],
