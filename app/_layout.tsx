@@ -110,6 +110,14 @@ function RootLayoutNav() {
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="(auth)/setup" options={{ gestureEnabled: false }} />
         <Stack.Screen name="(auth)/unlock" options={{ gestureEnabled: false }} />
+        {/* Group screens */}
+        <Stack.Screen name="group/form" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
+        <Stack.Screen name="group/[id]" options={{ animation: 'slide_from_right' }} />
+        {/* Student screens */}
+        <Stack.Screen name="student/form" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
+        <Stack.Screen name="student/bulk" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
+        <Stack.Screen name="student/[id]" options={{ animation: 'slide_from_right' }} />
+        {/* Dev screens */}
         <Stack.Screen name="__dev/components" options={{ presentation: 'modal' }} />
         <Stack.Screen name="__dev/db" options={{ presentation: 'modal' }} />
       </Stack>

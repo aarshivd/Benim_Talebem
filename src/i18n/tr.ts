@@ -81,6 +81,8 @@ const tr = {
     points: 'Henüz puan kaydı yok.',
     rewards: 'Henüz ödül tanımlanmadı.',
     groups: 'Henüz grup oluşturulmadı.',
+    groupsArchived: 'Arşivde grup yok.',
+    activeStudents: 'Bu grupta henüz talebe yok.',
   },
 
   // ── Snackbar ─────────────────────────────────────────────────────────────
@@ -110,3 +112,5 @@ const tr = {
 } as const;
 
 export default tr;
+
+// Bu satırın altına hiçbir şey ekleme — otomatik üretilmiş kontrol alanı
