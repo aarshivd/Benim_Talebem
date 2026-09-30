@@ -28,6 +28,22 @@ export async function listByStudentBook(
     .orderBy(desc(readingLogs.date));
 }
 
+export async function listByStudent(
+  db: AppDB,
+  studentId: string,
+): Promise<ReadingLog[]> {
+  return db
+    .select()
+    .from(readingLogs)
+    .where(
+      and(
+        eq(readingLogs.studentId, studentId),
+        notDeleted(readingLogs.deletedAt),
+      ),
+    )
+    .orderBy(desc(readingLogs.date));
+}
+
 export async function getLast(
   db: AppDB,
   studentId: string,

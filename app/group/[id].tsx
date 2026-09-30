@@ -175,8 +175,17 @@ export default function GroupDetailScreen() {
             )}
           </View>
         </View>
-        {/* Puan yer tutucuları — sonraki aşamada doldurulacak */}
-        <View style={{ alignItems: 'flex-end' }}>
+        {/* 📖 Okuma kısayolu ve yer tutucu */}
+        <View style={{ alignItems: 'flex-end', gap: 4 }}>
+          {!isMultiSelect && (
+            <Pressable
+              onPress={() => router.push(`/reading/new?studentId=${item.id}`)}
+              hitSlop={8}
+              accessibilityLabel="Okuma girişi"
+            >
+              <Text style={{ fontSize: 20 }}>📖</Text>
+            </Pressable>
+          )}
           <Text variant="caption" color={colors.muted}>—</Text>
         </View>
       </Pressable>
@@ -254,6 +263,16 @@ export default function GroupDetailScreen() {
           </View>
           <Text variant="caption" style={{ color: colorItem.text }}>Pasifleri göster</Text>
         </Pressable>
+
+        {/* Grup okuma girişi butonu */}
+        <View style={{ paddingHorizontal: spacing.base, marginTop: spacing.md }}>
+          <Button
+            label="📖 Grup Okuma Girişi"
+            variant="secondary"
+            size="sm"
+            onPress={() => router.push(`/reading/group?groupId=${id}`)}
+          />
+        </View>
       </View>
 
       {/* Liste */}

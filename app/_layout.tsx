@@ -120,6 +120,14 @@ function RootLayoutNav() {
         {/* Dev screens */}
         <Stack.Screen name="__dev/components" options={{ presentation: 'modal' }} />
         <Stack.Screen name="__dev/db" options={{ presentation: 'modal' }} />
+        {/* Book screens */}
+        <Stack.Screen name="book/form" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
+        <Stack.Screen name="book/[id]" options={{ animation: 'slide_from_right' }} />
+        <Stack.Screen name="book/assign" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
+        {/* Reading screens */}
+        <Stack.Screen name="reading/new" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
+        <Stack.Screen name="reading/group" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
+        <Stack.Screen name="reading/edit" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
       </Stack>
       <StatusBar style="dark" />
     </>
