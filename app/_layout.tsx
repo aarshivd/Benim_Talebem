@@ -133,9 +133,14 @@ function RootLayoutNav() {
         <Stack.Screen name="reading/new" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
         <Stack.Screen name="reading/group" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
         <Stack.Screen name="reading/edit" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
-        {/* Settings & Points screens */}
         <Stack.Screen name="settings/point-rules" options={{ animation: 'slide_from_right' }} />
         <Stack.Screen name="settings/point-rules/form" options={{ presentation: 'modal' }} />
+        <Stack.Screen name="settings/points-config" options={{ animation: 'slide_from_right' }} />
+        <Stack.Screen name="settings/rewards" options={{ animation: 'slide_from_right' }} />
+        <Stack.Screen name="settings/rewards/form" options={{ presentation: 'modal' }} />
+        <Stack.Screen name="settings/terms" options={{ animation: 'slide_from_right' }} />
+        <Stack.Screen name="settings/terms/form" options={{ presentation: 'modal' }} />
+        <Stack.Screen name="settings/security" options={{ animation: 'slide_from_right' }} />
         <Stack.Screen name="points/give" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
         <Stack.Screen name="board" options={{ headerShown: false, gestureEnabled: false, animation: 'fade' }} />
       </Stack>
