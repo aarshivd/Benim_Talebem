@@ -1,23 +1,200 @@
-import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import { useTheme } from '@/theme';
-import { Text, Screen } from '@/components/ui';
+/**
+ * app/(tabs)/index.tsx
+ * Hoca panosu (Bugün).
+ */
 
-export default function TabPlaceholderScreen() {
-  const { colors } = useTheme();
+import React, { useMemo } from 'react';
+import { View, StyleSheet, FlatList, Pressable, Alert } from 'react-native';
+import { useRouter } from 'expo-router';
+import { useTheme } from '@/theme';
+import { Screen, Text, StatCard, Avatar, Badge, IconButton } from '@/components/ui';
+import { Podium } from '@/components/ui/Podium';
+import { useSession } from '@/store/session';
+import { useRanking } from '@/features/ranking/hooks';
+import { useActiveTerm } from '@/features/terms/hooks';
+import { todayLocal, formatDayTr } from '@/domain';
+import { GroupPalette } from '@/theme/tokens';
+import tr from '@/i18n/tr';
+
+export default function DashboardScreen() {
+  const { colors, spacing, radius, shadows } = useTheme();
+  const router = useRouter();
+  const teacherName = useSession((s) => s.teacherName) ?? 'Hocam';
+  
+  const today = todayLocal();
+  const { data: activeTerm } = useActiveTerm();
+  const { data: rankingData, isLoading } = useRanking({ scope: 'daily', day: today });
+
+  const rankedRows = rankingData?.rankedRows ?? [];
+  
+  const stats = useMemo(() => {
+    let readingCount = 0;
+    let totalPages = 0;
+    let totalPoints = 0;
+    const notReadRows: typeof rankedRows = [];
+    
+    for (const row of rankedRows) {
+      if (row.pages > 0) {
+        readingCount++;
+        totalPages += row.pages;
+      } else {
+        notReadRows.push(row);
+      }
+      totalPoints += row.points;
+    }
+    
+    return {
+      totalStudents: rankedRows.length,
+      readingCount,
+      totalPages,
+      totalPoints,
+      notReadRows,
+    };
+  }, [rankedRows]);
+
+  const top3 = useMemo(() => [
+    rankedRows.find(r => r.rank === 1) ?? null,
+    rankedRows.find(r => r.rank === 2) ?? null,
+    rankedRows.find(r => r.rank === 3) ?? null,
+  ], [rankedRows]);
+
+  const renderHeader = () => (
+    <View style={{ gap: spacing.lg, paddingBottom: spacing.md }}>
+      {/* Selamlama & Tarih */}
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+        <View>
+          <Text variant="heading" color={colors.ink}>Merhaba, {teacherName}</Text>
+          <Text variant="body" color={colors.muted} style={{ marginTop: 2 }}>{formatDayTr(today)}</Text>
+        </View>
+        {activeTerm && (
+          <Badge label={activeTerm.name} variant="primary" />
+        )}
+      </View>
+
+      {/* İstatistikler */}
+      <View style={{ flexDirection: 'row', gap: spacing.sm }}>
+        <View style={{ flex: 1 }}>
+          <StatCard label="Okuyan" value={`${stats.readingCount} / ${stats.totalStudents}`} icon="book" color={colors.primary} />
+        </View>
+        <View style={{ flex: 1 }}>
+          <StatCard label="Sayfa" value={stats.totalPages.toString()} icon="layers" color={colors.success} />
+        </View>
+        <View style={{ flex: 1 }}>
+          <StatCard label="Puan" value={stats.totalPoints.toString()} icon="star" color={colors.warning} />
+        </View>
+      </View>
+
+      {/* Hızlı İşlemler */}
+      <View>
+        <Text variant="captionSemi" color={colors.muted} style={{ marginBottom: spacing.sm }}>Hızlı İşlemler</Text>
+        <View style={{ flexDirection: 'row', gap: spacing.sm }}>
+          <Pressable style={styles.actionBtn} onPress={() => router.push('/reading/new')}>
+            <View style={[styles.actionIcon, { backgroundColor: colors.primarySoft }]}><Text style={{ fontSize: 24 }}>📖</Text></View>
+            <Text variant="captionSemi" color={colors.ink} align="center">Okuma Gir</Text>
+          </Pressable>
+          <Pressable style={styles.actionBtn} onPress={() => router.push('/reading/group')}>
+            <View style={[styles.actionIcon, { backgroundColor: colors.successSoft }]}><Text style={{ fontSize: 24 }}>👥</Text></View>
+            <Text variant="captionSemi" color={colors.ink} align="center">Grup Okuma</Text>
+          </Pressable>
+          <Pressable style={styles.actionBtn} onPress={() => router.push('/(tabs)/groups')}>
+            <View style={[styles.actionIcon, { backgroundColor: colors.warningSoft }]}><Text style={{ fontSize: 24 }}>⭐</Text></View>
+            <Text variant="captionSemi" color={colors.ink} align="center">Puan Ver</Text>
+          </Pressable>
+          <Pressable style={styles.actionBtn} onPress={() => {
+            Alert.alert(
+              'Pano Modu',
+              'Pano modundan çıkmak için hocanın PIN kodu gerekir. Başlatılsın mı?',
+              [
+                { text: 'İptal', style: 'cancel' },
+                { text: 'Başlat', onPress: () => router.push('/board') }
+              ]
+            );
+          }}>
+            <View style={[styles.actionIcon, { backgroundColor: colors.skySoft }]}><Text style={{ fontSize: 24 }}>📺</Text></View>
+            <Text variant="captionSemi" color={colors.ink} align="center">Pano Modu</Text>
+          </Pressable>
+        </View>
+      </View>
+
+      {/* Yedek Hatırlatma Alanı (Aşama 12) */}
+      {/* <View style={{ backgroundColor: colors.dangerSoft, padding: spacing.md, borderRadius: radius.lg }}><Text>Yedek hatırlatma buraya gelecek.</Text></View> */}
+
+      {/* Bugünün Yıldızları */}
+      {top3.some(x => x !== null) && (
+        <View>
+          <Text variant="captionSemi" color={colors.muted} style={{ marginBottom: spacing.md }}>Bugünün Yıldızları</Text>
+          <Podium top3={top3} onPress={(id) => router.push(`/student/${id}`)} />
+        </View>
+      )}
+
+      {/* Liste Başlığı */}
+      {stats.notReadRows.length > 0 && (
+        <View style={{ marginTop: spacing.md }}>
+          <Text variant="captionSemi" color={colors.muted}>Okuması Girilmeyenler ({stats.notReadRows.length})</Text>
+        </View>
+      )}
+    </View>
+  );
+
+  const renderItem = ({ item }: { item: typeof rankedRows[0] }) => {
+    // Burada grup rengi elimizde yok, varsayılan atıyoruz ya da fetchleyebilirdik. Ancak rankedRows içinde groupId var, basitçe GroupPalette[0] kullansak yeterli ya da index mod vs.
+    // Şimdilik Avatar colorItem olarak soft bir renk verelim.
+    return (
+      <Pressable
+        onPress={() => router.push(`/reading/new?studentId=${item.studentId}`)}
+        style={[
+          styles.notReadRow,
+          {
+            backgroundColor: colors.surface,
+            borderBottomColor: colors.border,
+            borderBottomWidth: StyleSheet.hairlineWidth,
+            paddingVertical: spacing.sm,
+            paddingHorizontal: spacing.sm,
+          }
+        ]}
+      >
+        <Avatar name={item.name} emoji={item.avatar ?? undefined} size="sm" color={colors.surface} />
+        <View style={{ flex: 1, marginLeft: spacing.md }}>
+          <Text variant="bodySemi" color={colors.ink}>{item.name}</Text>
+        </View>
+        <IconButton icon="book-outline" onPress={() => router.push(`/reading/new?studentId=${item.studentId}`)} color={colors.primary} accessibilityLabel="Okuma gir" />
+      </Pressable>
+    );
+  };
+
   return (
     <Screen>
-      <View style={styles.container}>
-        <Text variant="heading" color={colors.ink}>Yakında</Text>
-      </View>
+      {isLoading ? (
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}><Text>Yükleniyor...</Text></View>
+      ) : (
+        <FlatList
+          data={stats.notReadRows}
+          keyExtractor={(item) => item.studentId}
+          renderItem={renderItem}
+          ListHeaderComponent={renderHeader}
+          contentContainerStyle={{ padding: spacing.base, paddingBottom: 100 }}
+          showsVerticalScrollIndicator={false}
+        />
+      )}
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  actionBtn: {
     flex: 1,
     alignItems: 'center',
+  },
+  actionIcon: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    alignItems: 'center',
     justifyContent: 'center',
+    marginBottom: 8,
+  },
+  notReadRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 });

@@ -55,6 +55,11 @@ function RootLayoutNav() {
   // AppState (otomatik kilit)
   useEffect(() => {
     const subscription = AppState.addEventListener('change', (nextAppState: AppStateStatus) => {
+      if (segments[0] === 'board') {
+        setAppState(nextAppState);
+        return;
+      }
+
       if (appState === 'active' && nextAppState.match(/inactive|background/)) {
         // Arka plana atıldı
         recordBackground();
@@ -68,7 +73,7 @@ function RootLayoutNav() {
     return () => {
       subscription.remove();
     };
-  }, [appState, checkAutoLock, recordBackground]);
+  }, [appState, checkAutoLock, recordBackground, segments]);
 
   // Yönlendirme (Routing Guard)
   useEffect(() => {
@@ -132,6 +137,7 @@ function RootLayoutNav() {
         <Stack.Screen name="settings/point-rules" options={{ animation: 'slide_from_right' }} />
         <Stack.Screen name="settings/point-rules/form" options={{ presentation: 'modal' }} />
         <Stack.Screen name="points/give" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
+        <Stack.Screen name="board" options={{ headerShown: false, gestureEnabled: false, animation: 'fade' }} />
       </Stack>
       <StatusBar style="dark" />
     </>
