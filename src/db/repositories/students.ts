@@ -62,6 +62,20 @@ export async function getStudent(db: AppDB, id: string): Promise<Student | null>
   return rows[0] ?? null;
 }
 
+export async function listActiveStudents(db: AppDB, groupId?: string): Promise<Student[]> {
+  const conditions = [
+    notDeleted(students.deletedAt),
+    eq(students.isActive, true),
+    ...(groupId ? [eq(students.groupId, groupId)] : []),
+  ];
+
+  return db
+    .select()
+    .from(students)
+    .where(and(...conditions))
+    .orderBy(students.firstName, students.lastName);
+}
+
 export async function createStudent(
   db: AppDB,
   data: Omit<NewStudent, 'id' | 'createdAt' | 'updatedAt' | 'deletedAt'>,

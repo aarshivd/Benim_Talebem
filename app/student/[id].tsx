@@ -30,6 +30,8 @@ import { useGroup } from '@/features/groups/hooks';
 import { useStudentBooks } from '@/features/books/hooks';
 import { useReadingLogs, useDeleteLog, useAllStudentLogs } from '@/features/reading/hooks';
 import { usePointEvents, useDeletePointEvent } from '@/features/points/hooks';
+import { useRanking } from '@/features/ranking/hooks';
+import { useActiveTerm } from '@/features/terms/hooks';
 import { calcStreak, todayLocal } from '@/domain';
 import tr from '@/i18n/tr';
 import type { StudentBook, ReadingLog, PointEvent } from '@/db/schema';
@@ -379,6 +381,15 @@ export default function StudentProfileScreen() {
   const deleteStudent = useDeleteStudent();
   const setActive = useSetStudentActive();
 
+  const { data: activeTerm } = useActiveTerm();
+  const { data: rankingData } = useRanking({
+    scope: 'term',
+    termId: activeTerm?.id,
+  });
+
+  const studentRewards = rankingData?.earnedRewards[id] ?? [];
+  const allRewards = rankingData?.allRewards ?? [];
+
   const colorItem = GroupPalette[group?.color ?? 0] ?? GroupPalette[0];
   const fullName = student ? `${student.firstName} ${student.lastName}` : '';
 
@@ -461,6 +472,24 @@ export default function StudentProfileScreen() {
       <View style={{ paddingHorizontal: spacing.base, paddingVertical: spacing.md }}>
         <Segmented options={TABS.map(t => ({ label: t.label, value: t.value }))} selected={activeTab} onSelect={(v) => setActiveTab(v as Tab)} />
       </View>
+
+      {/* Kazandığı Ödüller */}
+      {studentRewards.length > 0 && (
+        <View style={{ paddingHorizontal: spacing.base, marginBottom: spacing.sm }}>
+          <Text variant="captionSemi" color={colors.muted} style={{ marginBottom: spacing.xs }}>Bu Dönem Kazandığı Ödüller</Text>
+          <View style={{ flexDirection: 'row', gap: spacing.sm, flexWrap: 'wrap' }}>
+            {studentRewards.map(rid => {
+              const r = allRewards.find(x => x.id === rid);
+              return (
+                <View key={rid} style={{ backgroundColor: colors.sunSoft, paddingHorizontal: 12, paddingVertical: 6, borderRadius: radius.full, flexDirection: 'row', alignItems: 'center' }}>
+                  <Text style={{ fontSize: 16, marginRight: 6 }}>{r?.icon ?? '🏆'}</Text>
+                  <Text variant="captionSemi" color={colors.ink}>{r?.name}</Text>
+                </View>
+              );
+            })}
+          </View>
+        </View>
+      )}
 
       {/* Tab içerikleri */}
       <View style={{ flex: 1, paddingHorizontal: spacing.base }}>

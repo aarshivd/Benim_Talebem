@@ -29,3 +29,4 @@ export { Snackbar } from './Snackbar';
 export { EmojiPicker } from './EmojiPicker';
 export { ColorPicker } from './ColorPicker';
 export { PinPad } from './PinPad';
+export { Podium } from './Podium';
