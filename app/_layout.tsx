@@ -128,6 +128,10 @@ function RootLayoutNav() {
         <Stack.Screen name="reading/new" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
         <Stack.Screen name="reading/group" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
         <Stack.Screen name="reading/edit" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
+        {/* Settings & Points screens */}
+        <Stack.Screen name="settings/point-rules" options={{ animation: 'slide_from_right' }} />
+        <Stack.Screen name="settings/point-rules/form" options={{ presentation: 'modal' }} />
+        <Stack.Screen name="points/give" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
       </Stack>
       <StatusBar style="dark" />
     </>

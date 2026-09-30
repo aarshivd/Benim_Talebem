@@ -175,16 +175,25 @@ export default function GroupDetailScreen() {
             )}
           </View>
         </View>
-        {/* 📖 Okuma kısayolu ve yer tutucu */}
+        {/* 📖 Okuma ve ⭐ Puan kısayolları */}
         <View style={{ alignItems: 'flex-end', gap: 4 }}>
           {!isMultiSelect && (
-            <Pressable
-              onPress={() => router.push(`/reading/new?studentId=${item.id}`)}
-              hitSlop={8}
-              accessibilityLabel="Okuma girişi"
-            >
-              <Text style={{ fontSize: 20 }}>📖</Text>
-            </Pressable>
+            <View style={{ flexDirection: 'row', gap: spacing.md }}>
+              <Pressable
+                onPress={() => router.push(`/points/give?studentIds=${item.id}&groupId=${id}`)}
+                hitSlop={8}
+                accessibilityLabel="Puan ver"
+              >
+                <Text style={{ fontSize: 20 }}>⭐</Text>
+              </Pressable>
+              <Pressable
+                onPress={() => router.push(`/reading/new?studentId=${item.id}`)}
+                hitSlop={8}
+                accessibilityLabel="Okuma girişi"
+              >
+                <Text style={{ fontSize: 20 }}>📖</Text>
+              </Pressable>
+            </View>
           )}
           <Text variant="caption" color={colors.muted}>—</Text>
         </View>
@@ -325,9 +334,10 @@ export default function GroupDetailScreen() {
               label="Puan Ver"
               variant="secondary"
               size="sm"
-              onPress={() =>
-                Alert.alert('Yakında', 'Puan verme özelliği sonraki aşamada gelecek.')
-              }
+              onPress={() => {
+                router.push(`/points/give?studentIds=${Array.from(selectedIds).join(',')}&groupId=${id}`);
+                clearSelection();
+              }}
             />
             <Button
               label="Gruba Taşı"

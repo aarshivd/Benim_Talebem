@@ -29,9 +29,10 @@ import { useStudent, useDeleteStudent, useSetStudentActive } from '@/features/st
 import { useGroup } from '@/features/groups/hooks';
 import { useStudentBooks } from '@/features/books/hooks';
 import { useReadingLogs, useDeleteLog, useAllStudentLogs } from '@/features/reading/hooks';
+import { usePointEvents, useDeletePointEvent } from '@/features/points/hooks';
 import { calcStreak, todayLocal } from '@/domain';
 import tr from '@/i18n/tr';
-import type { StudentBook, ReadingLog } from '@/db/schema';
+import type { StudentBook, ReadingLog, PointEvent } from '@/db/schema';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -268,6 +269,102 @@ function BookLogsSection({ studentId, bookId, sb }: { studentId: string; bookId:
   );
 }
 
+// ─── Points tab content ───────────────────────────────────────────────────────
+
+function PointsTab({ studentId }: { studentId: string }) {
+  const { colors, spacing, radius, shadows } = useTheme();
+  const router = useRouter();
+  const { data: events = [] } = usePointEvents(studentId);
+  const deleteEvent = useDeletePointEvent();
+  const today = todayLocal();
+
+  const activeEvents = events.filter(e => !e.deletedAt);
+  const totalPoints = activeEvents.reduce((acc, e) => acc + e.points, 0);
+  const todayPoints = activeEvents.filter(e => e.date === today).reduce((acc, e) => acc + e.points, 0);
+
+  // Group by date
+  const grouped: Record<string, typeof activeEvents> = {};
+  for (const e of activeEvents) {
+    if (!grouped[e.date]) grouped[e.date] = [];
+    grouped[e.date].push(e);
+  }
+  const dates = Object.keys(grouped).sort((a, b) => b.localeCompare(a));
+
+  const handleDelete = (event: any) => {
+    Alert.alert(
+      'İşlemi Geri Al',
+      `${event.title} (${event.points} puan) işlemini geri almak istiyor musunuz?`,
+      [
+        { text: tr.common.cancel, style: 'cancel' },
+        {
+          text: 'Geri Al',
+          style: 'destructive',
+          onPress: () => deleteEvent.mutate(event.id),
+        },
+      ]
+    );
+  };
+
+  return (
+    <ScrollView contentContainerStyle={{ gap: spacing.md, paddingBottom: 100 }}>
+      {/* İstatistikler */}
+      <View style={{ flexDirection: 'row', gap: spacing.sm }}>
+        <View style={[{ flex: 1, backgroundColor: colors.surface, padding: spacing.md, borderRadius: radius.lg, ...shadows.sm }]}>
+          <Text variant="captionSemi" color={colors.muted}>Bugün</Text>
+          <Text variant="heading" color={colors.primary}>{todayPoints}</Text>
+        </View>
+        <View style={[{ flex: 1, backgroundColor: colors.surface, padding: spacing.md, borderRadius: radius.lg, ...shadows.sm }]}>
+          <Text variant="captionSemi" color={colors.muted}>Toplam</Text>
+          <Text variant="heading" color={colors.primary}>{totalPoints}</Text>
+        </View>
+      </View>
+
+      <Button
+        label="⭐ Puan Ver"
+        onPress={() => router.push(`/points/give?studentIds=${studentId}`)}
+        fullWidth
+      />
+
+      {dates.length === 0 ? (
+        <EmptyState emoji="⭐" title="Henüz puanı yok." />
+      ) : (
+        dates.map((d) => (
+          <View key={d} style={{ marginTop: spacing.sm }}>
+            <Text variant="captionSemi" color={colors.muted} style={{ marginBottom: spacing.sm }}>{d === today ? 'Bugün' : d}</Text>
+            <View style={{ backgroundColor: colors.surface, borderRadius: radius.xl, ...shadows.sm, overflow: 'hidden' }}>
+              {grouped[d].map((event, i) => {
+                const isLast = i === grouped[d].length - 1;
+                return (
+                  <View key={event.id} style={{ flexDirection: 'row', alignItems: 'center', padding: spacing.md, borderBottomWidth: isLast ? 0 : StyleSheet.hairlineWidth, borderBottomColor: colors.border }}>
+                    <Text style={{ fontSize: 24, marginRight: spacing.md }}>
+                      {event.source === 'reading' ? '📖' : event.source === 'manual' ? '⭐' : '✍️'}
+                    </Text>
+                    <View style={{ flex: 1 }}>
+                      <Text variant="bodySemi" color={colors.ink}>{event.title}</Text>
+                      {event.note && <Text variant="caption" color={colors.muted}>{event.note}</Text>}
+                      {event.source === 'reading' && <Text variant="caption" color={colors.muted}>Okuma kaydından hesaplanır</Text>}
+                    </View>
+                    <View style={{ alignItems: 'flex-end', marginLeft: spacing.sm }}>
+                      <Text variant="bodySemi" color={event.points > 0 ? colors.success : colors.danger}>
+                        {event.points > 0 ? `+${event.points}` : event.points}
+                      </Text>
+                      {event.source !== 'reading' && (
+                        <Pressable onPress={() => handleDelete(event)} hitSlop={8} style={{ marginTop: 4 }}>
+                          <Text variant="caption" color={colors.danger}>Geri al</Text>
+                        </Pressable>
+                      )}
+                    </View>
+                  </View>
+                );
+              })}
+            </View>
+          </View>
+        ))
+      )}
+    </ScrollView>
+  );
+}
+
 // ─── Main Screen ─────────────────────────────────────────────────────────────
 
 export default function StudentProfileScreen() {
@@ -355,6 +452,7 @@ export default function StudentProfileScreen() {
 
       {/* İşlem butonları */}
       <View style={{ flexDirection: 'row', gap: spacing.sm, paddingHorizontal: spacing.base, paddingVertical: spacing.md, backgroundColor: colors.surface, borderBottomColor: colors.border, borderBottomWidth: StyleSheet.hairlineWidth }}>
+        <Button label="⭐ Puan Ver" variant="primary" size="sm" onPress={() => router.push(`/points/give?studentIds=${id}`)} style={{ flex: 1 }} />
         <Button label={student.isActive ? 'Pasife Al' : 'Aktife Al'} variant="secondary" size="sm" onPress={handleToggleActive} />
         <Button label={tr.common.delete} variant="danger" size="sm" onPress={handleDelete} />
       </View>
@@ -369,7 +467,7 @@ export default function StudentProfileScreen() {
         {activeTab === 'reading' ? (
           <ReadingTab studentId={id} />
         ) : (
-          <EmptyState emoji="⭐" title="Puan geçmişi yakında" description="Manuel puan girişi bir sonraki aşamada eklenecek." />
+          <PointsTab studentId={id} />
         )}
       </View>
 

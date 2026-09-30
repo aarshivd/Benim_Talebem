@@ -11,7 +11,15 @@ export default function SettingsPlaceholderScreen() {
   return (
     <Screen>
       <View style={styles.container}>
-        <Text variant="heading" color={colors.ink} style={{ marginBottom: spacing.xl }}>Yakında</Text>
+        <Text variant="heading" color={colors.ink} style={{ marginBottom: spacing.xl }}>Ayarlar</Text>
+
+        <View style={{ gap: spacing.md, width: '100%', maxWidth: 300, marginBottom: spacing.xxl }}>
+          <Button
+            label="⭐ Puan Kuralları"
+            variant="secondary"
+            onPress={() => router.push('/settings/point-rules')}
+          />
+        </View>
 
         {__DEV__ && (
           <View style={{ gap: spacing.md, width: '100%', maxWidth: 300 }}>
