@@ -60,7 +60,11 @@ function Section({ title, children }: { title: string; children: React.ReactNode
           borderRadius: 8,
         }}
       >
-        <Text variant="captionSemi" color={colors.primary} style={{ textTransform: 'uppercase', letterSpacing: 1 }}>
+        <Text
+          variant="captionSemi"
+          color={colors.primary}
+          style={{ textTransform: 'uppercase', letterSpacing: 1 }}
+        >
           {title}
         </Text>
       </View>
@@ -94,7 +98,12 @@ export default function ComponentGallery() {
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.bg }]} edges={['top']}>
-      <View style={[styles.topBar, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
+      <View
+        style={[
+          styles.topBar,
+          { backgroundColor: colors.surface, borderBottomColor: colors.border },
+        ]}
+      >
         <Text variant="heading" color={colors.primary}>
           🎨 Bileşen Galerisi
         </Text>
@@ -108,7 +117,6 @@ export default function ComponentGallery() {
         contentContainerStyle={{ paddingTop: spacing.base, paddingBottom: 100 }}
         showsVerticalScrollIndicator={false}
       >
-
         {/* ── TİPOGRAFİ ─────────────────────────────────────────────── */}
         <Section title="Tipografi">
           <Text variant="display">Görüntü Başlık</Text>
@@ -117,8 +125,12 @@ export default function ComponentGallery() {
           <Text variant="bodySemi">Kalın Gövde Metni</Text>
           <Text variant="body">Normal gövde metni. Türkçe: ğüşıİöçĞÜŞÖÇ</Text>
           <Text variant="captionSemi">Açıklama Kalın</Text>
-          <Text variant="caption" color={colors.muted}>Açıklama normal</Text>
-          <Text variant="label" color={colors.muted}>KÜÇÜK ETİKET</Text>
+          <Text variant="caption" color={colors.muted}>
+            Açıklama normal
+          </Text>
+          <Text variant="label" color={colors.muted}>
+            KÜÇÜK ETİKET
+          </Text>
         </Section>
 
         {/* ── DÜĞMELER ─────────────────────────────────────────────── */}
@@ -145,8 +157,18 @@ export default function ComponentGallery() {
         <Section title="İkon Düğmeleri">
           <View style={{ flexDirection: 'row', gap: spacing.md }}>
             <IconButton icon="add-circle" onPress={() => {}} accessibilityLabel="Ekle" />
-            <IconButton icon="trash" onPress={() => {}} accessibilityLabel="Sil" color={colors.danger} />
-            <IconButton icon="pencil" onPress={() => {}} accessibilityLabel="Düzenle" color={colors.primary} />
+            <IconButton
+              icon="trash"
+              onPress={() => {}}
+              accessibilityLabel="Sil"
+              color={colors.danger}
+            />
+            <IconButton
+              icon="pencil"
+              onPress={() => {}}
+              accessibilityLabel="Düzenle"
+              color={colors.primary}
+            />
             <IconButton icon="share-social" onPress={() => {}} accessibilityLabel="Paylaş" />
             <IconButton icon="settings" onPress={() => {}} accessibilityLabel="Ayarlar" disabled />
           </View>
@@ -154,10 +176,18 @@ export default function ComponentGallery() {
 
         {/* ── KART ─────────────────────────────────────────────────── */}
         <Section title="Kart">
-          <Card shadow="none"><Text variant="body">Gölgesiz kart</Text></Card>
-          <Card shadow="sm"><Text variant="body">Küçük gölge</Text></Card>
-          <Card shadow="md"><Text variant="body">Orta gölge</Text></Card>
-          <Card shadow="lg"><Text variant="body">Büyük gölge</Text></Card>
+          <Card shadow="none">
+            <Text variant="body">Gölgesiz kart</Text>
+          </Card>
+          <Card shadow="sm">
+            <Text variant="body">Küçük gölge</Text>
+          </Card>
+          <Card shadow="md">
+            <Text variant="body">Orta gölge</Text>
+          </Card>
+          <Card shadow="lg">
+            <Text variant="body">Büyük gölge</Text>
+          </Card>
         </Section>
 
         {/* ── GİRİŞ ALANLARI ───────────────────────────────────────── */}
@@ -261,7 +291,14 @@ export default function ComponentGallery() {
 
         {/* ── ROZET ────────────────────────────────────────────────── */}
         <Section title="Rozet">
-          <View style={{ flexDirection: 'row', gap: spacing.md, flexWrap: 'wrap', alignItems: 'center' }}>
+          <View
+            style={{
+              flexDirection: 'row',
+              gap: spacing.md,
+              flexWrap: 'wrap',
+              alignItems: 'center',
+            }}
+          >
             <Badge count={3} variant="primary" />
             <Badge count={12} variant="success" />
             <Badge count={99} variant="warning" />
@@ -365,11 +402,7 @@ export default function ComponentGallery() {
 
         {/* ── RENK SEÇİCİ ──────────────────────────────────────────── */}
         <Section title="Renk Seçici">
-          <ColorPicker
-            label="Grup rengi"
-            selected={colorIdx}
-            onSelect={setColorIdx}
-          />
+          <ColorPicker label="Grup rengi" selected={colorIdx} onSelect={setColorIdx} />
         </Section>
 
         {/* ── EMOJİ SEÇİCİ ─────────────────────────────────────────── */}
@@ -396,11 +429,7 @@ export default function ComponentGallery() {
 
         {/* ── MODAL & DIALOG ────────────────────────────────────────── */}
         <Section title="Modal ve Diyalog">
-          <Button
-            label="Alt Sayfa Aç"
-            variant="primary"
-            onPress={() => setSheetVisible(true)}
-          />
+          <Button label="Alt Sayfa Aç" variant="primary" onPress={() => setSheetVisible(true)} />
           <Button
             label="Onay Diyaloğu Aç"
             variant="danger"
@@ -412,15 +441,10 @@ export default function ComponentGallery() {
             onPress={() => setSnackVisible(true)}
           />
         </Section>
-
       </ScrollView>
 
       {/* ── FAB ──────────────────────────────────────────────────── */}
-      <FAB
-        icon="add"
-        onPress={() => setSheetVisible(true)}
-        accessibilityLabel="Yeni kayıt ekle"
-      />
+      <FAB icon="add" onPress={() => setSheetVisible(true)} accessibilityLabel="Yeni kayıt ekle" />
 
       {/* ── MODALLER ─────────────────────────────────────────────── */}
       <BottomSheet

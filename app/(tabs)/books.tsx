@@ -12,7 +12,15 @@ import { useBooks, useDeleteBook, useBookReaders } from '@/features/books/hooks'
 import tr from '@/i18n/tr';
 import type { Book } from '@/db/schema';
 
-function BookCard({ item, onPress, onDelete }: { item: Book; onPress: () => void; onDelete: () => void }) {
+function BookCard({
+  item,
+  onPress,
+  onDelete,
+}: {
+  item: Book;
+  onPress: () => void;
+  onDelete: () => void;
+}) {
   const { colors, spacing, radius, shadows } = useTheme();
   const { data: readers = [] } = useBookReaders(item.id);
   const readerCount = readers.length;
@@ -34,15 +42,26 @@ function BookCard({ item, onPress, onDelete }: { item: Book; onPress: () => void
       accessibilityLabel={item.title}
     >
       <View style={{ flex: 1 }}>
-        <Text variant="bodySemi" color={colors.ink} numberOfLines={1}>{item.title}</Text>
+        <Text variant="bodySemi" color={colors.ink} numberOfLines={1}>
+          {item.title}
+        </Text>
         {item.author ? (
-          <Text variant="caption" color={colors.muted}>{item.author}</Text>
+          <Text variant="caption" color={colors.muted}>
+            {item.author}
+          </Text>
         ) : null}
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md, marginTop: spacing.xs }}>
-          <Text variant="caption" color={colors.muted}>{item.totalPages} sayfa</Text>
-          {readerCount > 0 && (
-            <Badge label={`${readerCount} talebe okuyor`} variant="primary" />
-          )}
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: spacing.md,
+            marginTop: spacing.xs,
+          }}
+        >
+          <Text variant="caption" color={colors.muted}>
+            {item.totalPages} sayfa
+          </Text>
+          {readerCount > 0 && <Badge label={`${readerCount} talebe okuyor`} variant="primary" />}
         </View>
       </View>
     </Pressable>
@@ -56,31 +75,28 @@ export default function BooksScreen() {
   const { data: books = [], isLoading, refetch } = useBooks();
   const deleteBook = useDeleteBook();
 
-  const filtered = books.filter((b) =>
-    !search.trim() ||
-    b.title.toLowerCase().includes(search.toLowerCase()) ||
-    (b.author?.toLowerCase().includes(search.toLowerCase()) ?? false),
+  const filtered = books.filter(
+    (b) =>
+      !search.trim() ||
+      b.title.toLowerCase().includes(search.toLowerCase()) ||
+      (b.author?.toLowerCase().includes(search.toLowerCase()) ?? false),
   );
 
   const handleDelete = (book: Book) => {
-    Alert.alert(
-      tr.deleteDialog.title,
-      'Okuyanı olan kitap silinemez.',
-      [
-        { text: tr.deleteDialog.cancel, style: 'cancel' },
-        {
-          text: tr.deleteDialog.confirm,
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await deleteBook.mutateAsync(book.id);
-            } catch (e: any) {
-              Alert.alert('Hata', e.message ?? tr.snackbar.error);
-            }
-          },
+    Alert.alert(tr.deleteDialog.title, 'Okuyanı olan kitap silinemez.', [
+      { text: tr.deleteDialog.cancel, style: 'cancel' },
+      {
+        text: tr.deleteDialog.confirm,
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            await deleteBook.mutateAsync(book.id);
+          } catch (e: any) {
+            Alert.alert('Hata', e.message ?? tr.snackbar.error);
+          }
         },
-      ],
-    );
+      },
+    ]);
   };
 
   return (

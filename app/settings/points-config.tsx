@@ -14,9 +14,15 @@ import { useSettings, useUpdateSettings } from '@/features/settings/hooks';
 import tr from '@/i18n/tr';
 
 const schema = z.object({
-  pages_per_point: z.string().refine(v => !isNaN(Number(v)) && Number(v) > 0, '1-100 arası olmalı'),
-  daily_goal_pages: z.string().refine(v => !isNaN(Number(v)) && Number(v) >= 0, '0 veya daha büyük olmalı'),
-  daily_goal_bonus: z.string().refine(v => !isNaN(Number(v)) && Number(v) >= 0, '0 veya daha büyük olmalı'),
+  pages_per_point: z
+    .string()
+    .refine((v) => !isNaN(Number(v)) && Number(v) > 0, '1-100 arası olmalı'),
+  daily_goal_pages: z
+    .string()
+    .refine((v) => !isNaN(Number(v)) && Number(v) >= 0, '0 veya daha büyük olmalı'),
+  daily_goal_bonus: z
+    .string()
+    .refine((v) => !isNaN(Number(v)) && Number(v) >= 0, '0 veya daha büyük olmalı'),
   allow_negative_points: z.boolean(),
 });
 
@@ -29,7 +35,13 @@ export default function PointsConfigScreen() {
   const { data: settings, isLoading } = useSettings();
   const updateSettings = useUpdateSettings();
 
-  const { control, handleSubmit, reset, watch, formState: { errors, isSubmitting } } = useForm<FormValues>({
+  const {
+    control,
+    handleSubmit,
+    reset,
+    watch,
+    formState: { errors, isSubmitting },
+  } = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
       pages_per_point: '10',
@@ -70,18 +82,33 @@ export default function PointsConfigScreen() {
   };
 
   if (isLoading) {
-    return <Screen title="Puan ve Okuma" showBack><Text>Yükleniyor...</Text></Screen>;
+    return (
+      <Screen title="Puan ve Okuma" showBack>
+        <Text>Yükleniyor...</Text>
+      </Screen>
+    );
   }
 
   return (
-    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
       <Screen title="Puan ve Okuma" showBack scroll>
         <ScrollView contentContainerStyle={{ gap: spacing.lg, paddingBottom: 40 }}>
-          
-          <View style={{ backgroundColor: colors.warningSoft, padding: spacing.md, borderRadius: radius.lg }}>
-            <Text variant="captionSemi" color={colors.ink}>⚠️ Uyarı</Text>
+          <View
+            style={{
+              backgroundColor: colors.warningSoft,
+              padding: spacing.md,
+              borderRadius: radius.lg,
+            }}
+          >
+            <Text variant="captionSemi" color={colors.ink}>
+              ⚠️ Uyarı
+            </Text>
             <Text variant="caption" color={colors.ink} style={{ marginTop: 4 }}>
-              Bu değişiklikler yalnızca bundan sonra hesaplanan günleri etkiler. Geçmişteki puanlar aynı kalır.
+              Bu değişiklikler yalnızca bundan sonra hesaplanan günleri etkiler. Geçmişteki puanlar
+              aynı kalır.
             </Text>
           </View>
 
@@ -143,8 +170,18 @@ export default function PointsConfigScreen() {
           />
 
           {/* Canlı Önizleme */}
-          <View style={{ backgroundColor: colors.surface, padding: spacing.md, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.border }}>
-            <Text variant="captionSemi" color={colors.muted}>Canlı Önizleme</Text>
+          <View
+            style={{
+              backgroundColor: colors.surface,
+              padding: spacing.md,
+              borderRadius: radius.lg,
+              borderWidth: 1,
+              borderColor: colors.border,
+            }}
+          >
+            <Text variant="captionSemi" color={colors.muted}>
+              Canlı Önizleme
+            </Text>
             <Text variant="body" color={colors.ink} style={{ marginTop: spacing.xs }}>
               {ppp > 0 ? `${ppp} sayfa = 1 puan.` : 'Geçersiz sayfa/puan oranı.'}
             </Text>

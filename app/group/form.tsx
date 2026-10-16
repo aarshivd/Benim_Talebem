@@ -5,14 +5,7 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import {
-  View,
-  StyleSheet,
-  KeyboardAvoidingView,
-  Platform,
-  Alert,
-  Pressable,
-} from 'react-native';
+import { View, StyleSheet, KeyboardAvoidingView, Platform, Alert, Pressable } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -36,7 +29,10 @@ import tr from '@/i18n/tr';
 const schema = z.object({
   name: z.string().min(1, tr.validation.required).max(50, tr.validation.maxLength(50)),
   level: z.enum(['ilkokul', 'ortaokul', 'lise', 'universite']),
-  color: z.number().min(0).max(GroupPalette.length - 1),
+  color: z
+    .number()
+    .min(0)
+    .max(GroupPalette.length - 1),
   emoji: z.string().min(1),
 });
 
@@ -127,21 +123,17 @@ export default function GroupFormScreen() {
       );
       return;
     }
-    Alert.alert(
-      tr.deleteDialog.title,
-      tr.deleteDialog.message,
-      [
-        { text: tr.deleteDialog.cancel, style: 'cancel' },
-        {
-          text: tr.deleteDialog.confirm,
-          style: 'destructive',
-          onPress: async () => {
-            await deleteGroup.mutateAsync(id);
-            router.back();
-          },
+    Alert.alert(tr.deleteDialog.title, tr.deleteDialog.message, [
+      { text: tr.deleteDialog.cancel, style: 'cancel' },
+      {
+        text: tr.deleteDialog.confirm,
+        style: 'destructive',
+        onPress: async () => {
+          await deleteGroup.mutateAsync(id);
+          router.back();
         },
-      ],
-    );
+      },
+    ]);
   };
 
   const colorItem = GroupPalette[selectedColor] ?? GroupPalette[0];
@@ -186,7 +178,9 @@ export default function GroupFormScreen() {
                     ]}
                     accessibilityLabel={tr.a11y.selectEmoji}
                   >
-                    <Text variant="display" style={{ fontSize: 40 }}>{field.value}</Text>
+                    <Text variant="display" style={{ fontSize: 40 }}>
+                      {field.value}
+                    </Text>
                   </Pressable>
                 )}
               />
@@ -210,7 +204,9 @@ export default function GroupFormScreen() {
 
             {/* Seviye */}
             <View>
-              <Text variant="label" style={{ marginBottom: spacing.sm }}>Seviye</Text>
+              <Text variant="label" style={{ marginBottom: spacing.sm }}>
+                Seviye
+              </Text>
               <Controller
                 control={control}
                 name="level"
@@ -226,15 +222,14 @@ export default function GroupFormScreen() {
 
             {/* Renk */}
             <View>
-              <Text variant="label" style={{ marginBottom: spacing.sm }}>Renk</Text>
+              <Text variant="label" style={{ marginBottom: spacing.sm }}>
+                Renk
+              </Text>
               <Controller
                 control={control}
                 name="color"
                 render={({ field }) => (
-                  <ColorPicker
-                    selected={field.value}
-                    onSelect={field.onChange}
-                  />
+                  <ColorPicker selected={field.value} onSelect={field.onChange} />
                 )}
               />
             </View>
@@ -249,12 +244,7 @@ export default function GroupFormScreen() {
 
             {/* Sil (sadece düzenleme) */}
             {isEdit && (
-              <Button
-                label={tr.common.delete}
-                variant="danger"
-                onPress={handleDelete}
-                fullWidth
-              />
+              <Button label={tr.common.delete} variant="danger" onPress={handleDelete} fullWidth />
             )}
           </View>
         </Screen>

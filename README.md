@@ -26,14 +26,14 @@ npx expo start
 
 ## Scriptler
 
-| Komut | Açıklama |
-|-------|----------|
-| `npm start` | Expo geliştirme sunucusunu başlatır |
-| `npm run android` | Android emülatöründe açar |
+| Komut               | Açıklama                                 |
+| ------------------- | ---------------------------------------- |
+| `npm start`         | Expo geliştirme sunucusunu başlatır      |
+| `npm run android`   | Android emülatöründe açar                |
 | `npm run typecheck` | TypeScript tip kontrolü (`tsc --noEmit`) |
-| `npm run lint` | ESLint kontrolü (`expo lint`) |
-| `npm test` | Jest testlerini çalıştırır |
-| `npm run format` | Prettier ile kodu formatlar |
+| `npm run lint`      | ESLint kontrolü (`expo lint`)            |
+| `npm test`          | Jest testlerini çalıştırır               |
+| `npm run format`    | Prettier ile kodu formatlar              |
 
 ## Klasör Yapısı
 

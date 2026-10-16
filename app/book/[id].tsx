@@ -25,7 +25,10 @@ export default function BookDetailScreen() {
 
   const handleDelete = () => {
     if (readers.length > 0) {
-      Alert.alert('Silinemez', 'Bu kitabı okuyan talebe var. Önce kitabı tüm talebelerin listesinden kaldır veya bekle.');
+      Alert.alert(
+        'Silinemez',
+        'Bu kitabı okuyan talebe var. Önce kitabı tüm talebelerin listesinden kaldır veya bekle.',
+      );
       return;
     }
     Alert.alert(tr.deleteDialog.title, tr.deleteDialog.message, [
@@ -41,15 +44,35 @@ export default function BookDetailScreen() {
     ]);
   };
 
-  if (!book) return <Screen title="Kitap" showBack><EmptyState emoji="📖" title="Kitap bulunamadı." /></Screen>;
+  if (!book)
+    return (
+      <Screen title="Kitap" showBack>
+        <EmptyState emoji="📖" title="Kitap bulunamadı." />
+      </Screen>
+    );
 
   const renderReader = ({ item }: { item: StudentBook }) => {
     const pct = book.totalPages > 0 ? item.currentPage / book.totalPages : 0;
     return (
-      <View style={[styles.readerRow, { backgroundColor: colors.surface, borderRadius: radius.lg, padding: spacing.base, marginBottom: spacing.sm, ...shadows.sm }]}>
+      <View
+        style={[
+          styles.readerRow,
+          {
+            backgroundColor: colors.surface,
+            borderRadius: radius.lg,
+            padding: spacing.base,
+            marginBottom: spacing.sm,
+            ...shadows.sm,
+          },
+        ]}
+      >
         <View style={{ flex: 1 }}>
-          <Text variant="body" color={colors.ink}>{item.studentId}</Text>
-          <Text variant="caption" color={colors.muted}>{STATUS_LABELS[item.status]} — {item.currentPage}/{book.totalPages} sayfa</Text>
+          <Text variant="body" color={colors.ink}>
+            {item.studentId}
+          </Text>
+          <Text variant="caption" color={colors.muted}>
+            {STATUS_LABELS[item.status]} — {item.currentPage}/{book.totalPages} sayfa
+          </Text>
           <View style={{ marginTop: spacing.xs }}>
             <ProgressBar progress={pct} height={6} />
           </View>
@@ -63,12 +86,23 @@ export default function BookDetailScreen() {
       title={book.title}
       showBack
       rightSlot={
-        <IconButton icon="create-outline" onPress={() => router.push(`/book/form?id=${id}`)} accessibilityLabel={tr.common.edit} color={colors.ink} />
+        <IconButton
+          icon="create-outline"
+          onPress={() => router.push(`/book/form?id=${id}`)}
+          accessibilityLabel={tr.common.edit}
+          color={colors.ink}
+        />
       }
     >
       <View style={{ marginBottom: spacing.xl }}>
-        {book.author ? <Text variant="body" color={colors.muted}>{book.author}</Text> : null}
-        <Text variant="caption" color={colors.muted}>{book.totalPages} sayfa · {readers.length} okuyan</Text>
+        {book.author ? (
+          <Text variant="body" color={colors.muted}>
+            {book.author}
+          </Text>
+        ) : null}
+        <Text variant="caption" color={colors.muted}>
+          {book.totalPages} sayfa · {readers.length} okuyan
+        </Text>
       </View>
 
       <FlatList

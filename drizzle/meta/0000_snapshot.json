@@ -62,9 +62,7 @@
       "indexes": {
         "books_deleted_at_idx": {
           "name": "books_deleted_at_idx",
-          "columns": [
-            "deleted_at"
-          ],
+          "columns": ["deleted_at"],
           "isUnique": false
         }
       },
@@ -156,9 +154,7 @@
       "indexes": {
         "groups_deleted_at_idx": {
           "name": "groups_deleted_at_idx",
-          "columns": [
-            "deleted_at"
-          ],
+          "columns": ["deleted_at"],
           "isUnique": false
         }
       },
@@ -254,31 +250,22 @@
       "indexes": {
         "point_events_student_date_idx": {
           "name": "point_events_student_date_idx",
-          "columns": [
-            "student_id",
-            "date"
-          ],
+          "columns": ["student_id", "date"],
           "isUnique": false
         },
         "point_events_date_idx": {
           "name": "point_events_date_idx",
-          "columns": [
-            "date"
-          ],
+          "columns": ["date"],
           "isUnique": false
         },
         "point_events_student_id_idx": {
           "name": "point_events_student_id_idx",
-          "columns": [
-            "student_id"
-          ],
+          "columns": ["student_id"],
           "isUnique": false
         },
         "point_events_deleted_at_idx": {
           "name": "point_events_deleted_at_idx",
-          "columns": [
-            "deleted_at"
-          ],
+          "columns": ["deleted_at"],
           "isUnique": false
         }
       },
@@ -287,12 +274,8 @@
           "name": "point_events_student_id_students_id_fk",
           "tableFrom": "point_events",
           "tableTo": "students",
-          "columnsFrom": [
-            "student_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["student_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -300,12 +283,8 @@
           "name": "point_events_rule_id_point_rules_id_fk",
           "tableFrom": "point_events",
           "tableTo": "point_rules",
-          "columnsFrom": [
-            "rule_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["rule_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -396,9 +375,7 @@
       "indexes": {
         "point_rules_deleted_at_idx": {
           "name": "point_rules_deleted_at_idx",
-          "columns": [
-            "deleted_at"
-          ],
+          "columns": ["deleted_at"],
           "isUnique": false
         }
       },
@@ -486,24 +463,17 @@
       "indexes": {
         "reading_logs_student_date_idx": {
           "name": "reading_logs_student_date_idx",
-          "columns": [
-            "student_id",
-            "date"
-          ],
+          "columns": ["student_id", "date"],
           "isUnique": false
         },
         "reading_logs_student_id_idx": {
           "name": "reading_logs_student_id_idx",
-          "columns": [
-            "student_id"
-          ],
+          "columns": ["student_id"],
           "isUnique": false
         },
         "reading_logs_deleted_at_idx": {
           "name": "reading_logs_deleted_at_idx",
-          "columns": [
-            "deleted_at"
-          ],
+          "columns": ["deleted_at"],
           "isUnique": false
         }
       },
@@ -512,12 +482,8 @@
           "name": "reading_logs_student_id_students_id_fk",
           "tableFrom": "reading_logs",
           "tableTo": "students",
-          "columnsFrom": [
-            "student_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["student_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -525,12 +491,8 @@
           "name": "reading_logs_book_id_books_id_fk",
           "tableFrom": "reading_logs",
           "tableTo": "books",
-          "columnsFrom": [
-            "book_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["book_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -634,9 +596,7 @@
       "indexes": {
         "rewards_deleted_at_idx": {
           "name": "rewards_deleted_at_idx",
-          "columns": [
-            "deleted_at"
-          ],
+          "columns": ["deleted_at"],
           "isUnique": false
         }
       },
@@ -758,23 +718,17 @@
       "indexes": {
         "student_books_student_id_idx": {
           "name": "student_books_student_id_idx",
-          "columns": [
-            "student_id"
-          ],
+          "columns": ["student_id"],
           "isUnique": false
         },
         "student_books_book_id_idx": {
           "name": "student_books_book_id_idx",
-          "columns": [
-            "book_id"
-          ],
+          "columns": ["book_id"],
           "isUnique": false
         },
         "student_books_deleted_at_idx": {
           "name": "student_books_deleted_at_idx",
-          "columns": [
-            "deleted_at"
-          ],
+          "columns": ["deleted_at"],
           "isUnique": false
         }
       },
@@ -783,12 +737,8 @@
           "name": "student_books_student_id_students_id_fk",
           "tableFrom": "student_books",
           "tableTo": "students",
-          "columnsFrom": [
-            "student_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["student_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -796,12 +746,8 @@
           "name": "student_books_book_id_books_id_fk",
           "tableFrom": "student_books",
           "tableTo": "books",
-          "columnsFrom": [
-            "book_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["book_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -897,16 +843,12 @@
       "indexes": {
         "students_group_id_idx": {
           "name": "students_group_id_idx",
-          "columns": [
-            "group_id"
-          ],
+          "columns": ["group_id"],
           "isUnique": false
         },
         "students_deleted_at_idx": {
           "name": "students_deleted_at_idx",
-          "columns": [
-            "deleted_at"
-          ],
+          "columns": ["deleted_at"],
           "isUnique": false
         }
       },
@@ -915,12 +857,8 @@
           "name": "students_group_id_groups_id_fk",
           "tableFrom": "students",
           "tableTo": "groups",
-          "columnsFrom": [
-            "group_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["group_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -995,9 +933,7 @@
       "indexes": {
         "terms_deleted_at_idx": {
           "name": "terms_deleted_at_idx",
-          "columns": [
-            "deleted_at"
-          ],
+          "columns": ["deleted_at"],
           "isUnique": false
         }
       },

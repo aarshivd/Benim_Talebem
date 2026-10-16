@@ -18,7 +18,9 @@ export default function SettingsScreen() {
     <Screen title="Ayarlar" scroll>
       <ScrollView contentContainerStyle={{ paddingBottom: spacing.xxl }}>
         <SectionHeader title="Ödül ve Puan" />
-        <View style={styles.section}>
+        <View
+          style={[styles.section, { backgroundColor: colors.surface, borderColor: colors.border }]}
+        >
           <ListItem
             title="Puan ve Okuma"
             subtitle="Sayfa-puan oranı ve hedefler"
@@ -40,7 +42,9 @@ export default function SettingsScreen() {
         </View>
 
         <SectionHeader title="Sistem" />
-        <View style={styles.section}>
+        <View
+          style={[styles.section, { backgroundColor: colors.surface, borderColor: colors.border }]}
+        >
           <ListItem
             title="Dönemler"
             subtitle="Okul dönemleri ve tarihleri"
@@ -57,19 +61,21 @@ export default function SettingsScreen() {
             title="Yedekleme"
             subtitle="Verileri dışa/içe aktar"
             leftSlot={<Ionicons name="save-outline" size={24} color={colors.primary} />}
-            onPress={() => {
-              // Aşama 12
-            }}
+            onPress={() => router.push('/settings/backup')}
           />
         </View>
 
         <SectionHeader title="Hakkında" />
-        <View style={styles.section}>
+        <View
+          style={[styles.section, { backgroundColor: colors.surface, borderColor: colors.border }]}
+        >
           <View style={{ paddingHorizontal: spacing.md, paddingVertical: spacing.sm }}>
-            <Text variant="captionSemi" color={colors.ink}>Sürüm 1.0.0</Text>
+            <Text variant="captionSemi" color={colors.ink}>
+              Sürüm 1.0.0
+            </Text>
             <Text variant="caption" color={colors.muted} style={{ marginTop: 4 }}>
-              Benim Talebem, talebelerin okuma ve puanlarını takip etmek için tasarlanmıştır. 
-              Tüm veriler yalnızca bu cihazda tutulmaktadır.
+              Benim Talebem, talebelerin okuma ve puanlarını takip etmek için tasarlanmıştır. Tüm
+              veriler yalnızca bu cihazda tutulmaktadır.
             </Text>
           </View>
         </View>
@@ -77,16 +83,37 @@ export default function SettingsScreen() {
         {__DEV__ && (
           <View style={{ marginTop: spacing.xl }}>
             <SectionHeader title="Geliştirici" />
-            <View style={styles.section}>
+            <View
+              style={[
+                styles.section,
+                { backgroundColor: colors.surface, borderColor: colors.border },
+              ]}
+            >
               <ListItem
                 title="Bileşen Galerisi"
-                leftSlot={<Ionicons name="color-palette-outline" size={24} color={colors.primary} />}
+                leftSlot={
+                  <Ionicons name="color-palette-outline" size={24} color={colors.primary} />
+                }
                 onPress={() => router.push('/__dev/components' as any)}
               />
               <ListItem
                 title="DB Testleri"
                 leftSlot={<Ionicons name="server-outline" size={24} color={colors.primary} />}
                 onPress={() => router.push('/__dev/db' as any)}
+              />
+              <ListItem
+                title="Demo Veri Yönetimi"
+                subtitle="Veri yükle veya temizle"
+                leftSlot={<Ionicons name="construct-outline" size={24} color={colors.primary} />}
+                onPress={() => router.push('/__dev/demo' as any)}
+              />
+              <ListItem
+                title="Veri Bütünlüğü"
+                subtitle="Mimari ve veri hatalarını denetle"
+                leftSlot={
+                  <Ionicons name="shield-checkmark-outline" size={24} color={colors.danger} />
+                }
+                onPress={() => router.push('/__dev/integrity' as any)}
               />
             </View>
           </View>
@@ -98,12 +125,10 @@ export default function SettingsScreen() {
 
 const styles = StyleSheet.create({
   section: {
-    backgroundColor: '#FFFFFF',
     borderRadius: 12,
     marginHorizontal: 16,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: '#EADFCF',
     marginBottom: 24,
-  }
+  },
 });

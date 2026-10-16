@@ -4,7 +4,15 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, ScrollView, Alert, KeyboardAvoidingView, Platform, Modal } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  Modal,
+} from 'react-native';
 import { useRouter } from 'expo-router';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -35,7 +43,12 @@ export default function SecurityScreen() {
   const [pinError, setPinError] = useState('');
   const [newPinTemp, setNewPinTemp] = useState('');
 
-  const { control, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<FormValues>({
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
       teacher_name: '',
@@ -58,7 +71,7 @@ export default function SecurityScreen() {
         teacher_name: values.teacher_name,
         auto_lock_seconds: Number(values.auto_lock_seconds),
       } as any);
-      
+
       // Update session store with new name
       await init();
       Alert.alert('Başarılı', 'Ayarlar kaydedildi.');
@@ -69,13 +82,13 @@ export default function SecurityScreen() {
 
   const handlePinPress = (key: string) => {
     if (pinInput.length < 6) {
-      setPinInput(prev => prev + key);
+      setPinInput((prev) => prev + key);
       setPinError('');
     }
   };
 
   const handlePinDelete = () => {
-    setPinInput(prev => prev.slice(0, -1));
+    setPinInput((prev) => prev.slice(0, -1));
     setPinError('');
   };
 
@@ -118,14 +131,20 @@ export default function SecurityScreen() {
   };
 
   if (isLoading) {
-    return <Screen title="Güvenlik" showBack><Text>Yükleniyor...</Text></Screen>;
+    return (
+      <Screen title="Güvenlik" showBack>
+        <Text>Yükleniyor...</Text>
+      </Screen>
+    );
   }
 
   return (
-    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
       <Screen title="Güvenlik" showBack scroll>
         <ScrollView contentContainerStyle={{ gap: spacing.lg, paddingBottom: 40 }}>
-          
           <Controller
             control={control}
             name="teacher_name"
@@ -145,7 +164,9 @@ export default function SecurityScreen() {
             name="auto_lock_seconds"
             render={({ field }) => (
               <View>
-                <Text variant="label" color={colors.muted} style={{ marginBottom: spacing.xs }}>Otomatik Kilit Süresi</Text>
+                <Text variant="label" color={colors.muted} style={{ marginBottom: spacing.xs }}>
+                  Otomatik Kilit Süresi
+                </Text>
                 <Segmented
                   options={[
                     { label: 'Hemen', value: '1' },
@@ -167,8 +188,17 @@ export default function SecurityScreen() {
             fullWidth
           />
 
-          <View style={{ marginTop: spacing.xl, paddingTop: spacing.xl, borderTopWidth: 1, borderTopColor: colors.border }}>
-            <Text variant="heading" color={colors.ink} style={{ marginBottom: spacing.md }}>PIN Yönetimi</Text>
+          <View
+            style={{
+              marginTop: spacing.xl,
+              paddingTop: spacing.xl,
+              borderTopWidth: 1,
+              borderTopColor: colors.border,
+            }}
+          >
+            <Text variant="heading" color={colors.ink} style={{ marginBottom: spacing.md }}>
+              PIN Yönetimi
+            </Text>
             <Button
               label="PIN Değiştir"
               variant="secondary"
@@ -182,30 +212,67 @@ export default function SecurityScreen() {
         </ScrollView>
 
         <Modal visible={pinStep !== 'none'} transparent animationType="fade">
-          <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.8)', justifyContent: 'center', padding: spacing.xl }}>
-            <View style={{ backgroundColor: colors.surface, padding: spacing.xl, borderRadius: radius.xl, alignItems: 'center' }}>
+          <View
+            style={{
+              flex: 1,
+              backgroundColor: 'rgba(0,0,0,0.8)',
+              justifyContent: 'center',
+              padding: spacing.xl,
+            }}
+          >
+            <View
+              style={{
+                backgroundColor: colors.surface,
+                padding: spacing.xl,
+                borderRadius: radius.xl,
+                alignItems: 'center',
+              }}
+            >
               <Text variant="heading" color={colors.ink} style={{ marginBottom: spacing.md }}>
-                {pinStep === 'old' ? 'Eski PIN Kodunuz' : pinStep === 'new' ? 'Yeni PIN Belirleyin' : 'Yeni PIN Tekrar'}
+                {pinStep === 'old'
+                  ? 'Eski PIN Kodunuz'
+                  : pinStep === 'new'
+                    ? 'Yeni PIN Belirleyin'
+                    : 'Yeni PIN Tekrar'}
               </Text>
 
               <View style={{ flexDirection: 'row', gap: 12, marginBottom: spacing.xl }}>
                 {Array.from({ length: 6 }).map((_, i) => (
-                  <View key={i} style={[styles.pinDot, { backgroundColor: i < pinInput.length ? colors.primary : colors.border }]} />
+                  <View
+                    key={i}
+                    style={[
+                      styles.pinDot,
+                      { backgroundColor: i < pinInput.length ? colors.primary : colors.border },
+                    ]}
+                  />
                 ))}
               </View>
 
-              {!!pinError && <Text variant="caption" color={colors.danger} style={{ marginBottom: spacing.md }}>{pinError}</Text>}
+              {!!pinError && (
+                <Text variant="caption" color={colors.danger} style={{ marginBottom: spacing.md }}>
+                  {pinError}
+                </Text>
+              )}
 
               <PinPad onKeyPress={handlePinPress} onDelete={handlePinDelete} />
-              
+
               <View style={{ flexDirection: 'row', gap: spacing.md, marginTop: spacing.xl }}>
-                <Button label="İptal" variant="secondary" onPress={() => setPinStep('none')} style={{ flex: 1 }} />
-                <Button label="Onayla" variant="primary" onPress={handlePinConfirm} style={{ flex: 1 }} />
+                <Button
+                  label="İptal"
+                  variant="secondary"
+                  onPress={() => setPinStep('none')}
+                  style={{ flex: 1 }}
+                />
+                <Button
+                  label="Onayla"
+                  variant="primary"
+                  onPress={handlePinConfirm}
+                  style={{ flex: 1 }}
+                />
               </View>
             </View>
           </View>
         </Modal>
-
       </Screen>
     </KeyboardAvoidingView>
   );
@@ -216,5 +283,5 @@ const styles = StyleSheet.create({
     width: 16,
     height: 16,
     borderRadius: 8,
-  }
+  },
 });

@@ -9,7 +9,7 @@ import { useSession } from '@/store/session';
 
 export default function UnlockScreen() {
   const { colors } = useTheme();
-  const unlock = useSession(s => s.unlock);
+  const unlock = useSession((s) => s.unlock);
 
   const [pin, setPin] = useState('');
   const [error, setError] = useState('');
@@ -26,7 +26,7 @@ export default function UnlockScreen() {
       };
       const sub = BackHandler.addEventListener('hardwareBackPress', onBackPress);
       return () => sub.remove();
-    }, [])
+    }, []),
   );
 
   useEffect(() => {
@@ -38,7 +38,7 @@ export default function UnlockScreen() {
     let interval: ReturnType<typeof setInterval>;
     if (lockoutSecs > 0) {
       interval = setInterval(() => {
-        setLockoutSecs(s => {
+        setLockoutSecs((s) => {
           if (s <= 1) return 0;
           return s - 1;
         });
@@ -63,13 +63,13 @@ export default function UnlockScreen() {
       Animated.timing(shakeAnim, { toValue: 10, duration: 50, useNativeDriver: true }),
       Animated.timing(shakeAnim, { toValue: -10, duration: 50, useNativeDriver: true }),
       Animated.timing(shakeAnim, { toValue: 10, duration: 50, useNativeDriver: true }),
-      Animated.timing(shakeAnim, { toValue: 0, duration: 50, useNativeDriver: true })
+      Animated.timing(shakeAnim, { toValue: 0, duration: 50, useNativeDriver: true }),
     ]).start();
   };
 
   const handleKeyPress = async (key: string) => {
     if (lockoutSecs > 0) return;
-    
+
     setError('');
     const newPin = pin + key;
     setPin(newPin);
@@ -89,8 +89,9 @@ export default function UnlockScreen() {
             shakeError();
             setPin('');
             await checkLockout(); // Ceza var mı kontrol et
-            if (lockoutSecs === 0 && !error) { // Yeni lockout gelmediyse jenerik hata
-               setError('Hatalı PIN.');
+            if (lockoutSecs === 0 && !error) {
+              // Yeni lockout gelmediyse jenerik hata
+              setError('Hatalı PIN.');
             }
           }
         }
@@ -104,7 +105,7 @@ export default function UnlockScreen() {
 
   const handleDelete = () => {
     if (lockoutSecs > 0) return;
-    setPin(p => p.slice(0, -1));
+    setPin((p) => p.slice(0, -1));
     setError('');
   };
 
@@ -136,8 +137,8 @@ export default function UnlockScreen() {
       'PIN kodunuzu sıfırlamak için tüm uygulamanın sıfırlanması gerekmektedir. Devam ederseniz, cihazdaki tüm veriler silinir. (Eğer yedek aldıysanız, kurulumdan sonra geri yükleyebilirsiniz.)\n\nEmin misiniz?',
       [
         { text: 'Vazgeç', style: 'cancel' },
-        { 
-          text: 'Tüm Verileri Sil', 
+        {
+          text: 'Tüm Verileri Sil',
           style: 'destructive',
           onPress: () => {
             Alert.alert(
@@ -155,19 +156,24 @@ export default function UnlockScreen() {
                     // Şimdilik sadece reload veya error throw
                     // Uygulama yeniden başlatılınca veya layout tetiklenince setup'a döner.
                     // (Gerçek hayatta DB dosyasını silip expo-updates reloadAsync yapmak en iyisidir)
-                  }
-                }
-              ]
+                  },
+                },
+              ],
             );
-          }
-        }
-      ]
+          },
+        },
+      ],
     );
   };
 
   const renderDots = () => {
     return (
-      <Animated.View style={[{ flexDirection: 'row', gap: 16, justifyContent: 'center', marginVertical: 32 }, { transform: [{ translateX: shakeAnim }] }]}>
+      <Animated.View
+        style={[
+          { flexDirection: 'row', gap: 16, justifyContent: 'center', marginVertical: 32 },
+          { transform: [{ translateX: shakeAnim }] },
+        ]}
+      >
         {[0, 1, 2, 3, 4, 5].map((i) => {
           const isFilled = i < pin.length;
           return (
@@ -192,7 +198,7 @@ export default function UnlockScreen() {
         <Text variant="heading" align="center" style={{ marginTop: 40 }}>
           Kilidi Açın
         </Text>
-        
+
         {/* eslint-disable-next-line react-hooks/refs */}
         {renderDots()}
 
@@ -209,20 +215,16 @@ export default function UnlockScreen() {
           )}
         </View>
 
-        <PinPad 
-          onKeyPress={handleKeyPress} 
-          onDelete={handleDelete} 
-          disabled={lockoutSecs > 0} 
-        />
-        
+        <PinPad onKeyPress={handleKeyPress} onDelete={handleDelete} disabled={lockoutSecs > 0} />
+
         <View style={styles.footer}>
           {pin.length >= 4 && (
-             <Button label="Giriş" onPress={handleSubmit} style={{ marginBottom: 16, width: 200 }} />
+            <Button label="Giriş" onPress={handleSubmit} style={{ marginBottom: 16, width: 200 }} />
           )}
-          <Button 
-            label="PIN'imi unuttum" 
-            variant="ghost" 
-            onPress={handleForgotPin} 
+          <Button
+            label="PIN'imi unuttum"
+            variant="ghost"
+            onPress={handleForgotPin}
             disabled={lockoutSecs > 0}
           />
         </View>
@@ -240,5 +242,5 @@ const styles = StyleSheet.create({
   footer: {
     marginTop: 40,
     alignItems: 'center',
-  }
+  },
 });

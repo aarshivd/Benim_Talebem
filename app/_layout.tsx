@@ -12,28 +12,48 @@ import { useFonts } from '@/lib/useFonts';
 import { Colors } from '@/theme/tokens';
 import { DbProvider } from '@/db/DbProvider';
 import { useSession } from '@/store/session';
+import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
+import { Snackbar } from '@/components/ui/Snackbar';
+import { useUIStore } from '@/store/ui';
+import { logger } from '@/lib/logger';
+import { QueryCache, MutationCache } from '@tanstack/react-query';
 
 // SplashScreen'i manuel yöneteceğiz
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  queryCache: new QueryCache({
+    onError: (error) => {
+      logger.error('Query error:', error);
+      useUIStore.getState().showSnackbar(`Veri yüklenemedi: ${error.message}`, 'error');
+    },
+  }),
+  mutationCache: new MutationCache({
+    onError: (error) => {
+      logger.error('Mutation error:', error);
+      useUIStore.getState().showSnackbar(`İşlem başarısız: ${error.message}`, 'error');
+    },
+  }),
+});
 
 export default function RootLayout() {
   const { fontsLoaded, fontError } = useFonts();
 
-  if (!fontsLoaded && !fontError) {
-    return null;
-  }
+  // if (!fontsLoaded && !fontError) {
+  //   return null;
+  // }
 
   return (
     <QueryClientProvider client={queryClient}>
       <SafeAreaProvider>
         <GestureHandlerRootView style={{ flex: 1 }}>
           <ThemeProvider variant="playful">
-            {/* DbProvider başarılı olana kadar loading gösterir, sonra children */}
-            <DbProvider>
-              <RootLayoutNav />
-            </DbProvider>
+            <ErrorBoundary>
+              {/* DbProvider başarılı olana kadar loading gösterir, sonra children */}
+              <DbProvider>
+                <RootLayoutNav />
+              </DbProvider>
+            </ErrorBoundary>
           </ThemeProvider>
         </GestureHandlerRootView>
       </SafeAreaProvider>
@@ -44,8 +64,10 @@ export default function RootLayout() {
 function RootLayoutNav() {
   const segments = useSegments();
   const router = useRouter();
-  const { isInitialized, isSetupDone, isUnlocked, init, checkAutoLock, recordBackground } = useSession();
+  const { isInitialized, isSetupDone, isUnlocked, init, checkAutoLock, recordBackground } =
+    useSession();
   const [appState, setAppState] = useState(AppState.currentState);
+  const { visible, message, variant, actionLabel, onAction, hideSnackbar } = useUIStore();
 
   // Uygulama yüklenince init et
   useEffect(() => {
@@ -106,7 +128,7 @@ function RootLayoutNav() {
   }, [isInitialized]);
 
   if (!isInitialized) {
-    return <View style={{ flex: 1, backgroundColor: Colors.bg }} />;
+    return <View style={{ flex: 1, backgroundColor: 'green' }} />;
   }
 
   return (
@@ -116,23 +138,48 @@ function RootLayoutNav() {
         <Stack.Screen name="(auth)/setup" options={{ gestureEnabled: false }} />
         <Stack.Screen name="(auth)/unlock" options={{ gestureEnabled: false }} />
         {/* Group screens */}
-        <Stack.Screen name="group/form" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
+        <Stack.Screen
+          name="group/form"
+          options={{ presentation: 'modal', animation: 'slide_from_bottom' }}
+        />
         <Stack.Screen name="group/[id]" options={{ animation: 'slide_from_right' }} />
         {/* Student screens */}
-        <Stack.Screen name="student/form" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
-        <Stack.Screen name="student/bulk" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
+        <Stack.Screen
+          name="student/form"
+          options={{ presentation: 'modal', animation: 'slide_from_bottom' }}
+        />
+        <Stack.Screen
+          name="student/bulk"
+          options={{ presentation: 'modal', animation: 'slide_from_bottom' }}
+        />
         <Stack.Screen name="student/[id]" options={{ animation: 'slide_from_right' }} />
         {/* Dev screens */}
         <Stack.Screen name="__dev/components" options={{ presentation: 'modal' }} />
         <Stack.Screen name="__dev/db" options={{ presentation: 'modal' }} />
+        <Stack.Screen name="__dev/demo" options={{ presentation: 'modal' }} />
         {/* Book screens */}
-        <Stack.Screen name="book/form" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
+        <Stack.Screen
+          name="book/form"
+          options={{ presentation: 'modal', animation: 'slide_from_bottom' }}
+        />
         <Stack.Screen name="book/[id]" options={{ animation: 'slide_from_right' }} />
-        <Stack.Screen name="book/assign" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
+        <Stack.Screen
+          name="book/assign"
+          options={{ presentation: 'modal', animation: 'slide_from_bottom' }}
+        />
         {/* Reading screens */}
-        <Stack.Screen name="reading/new" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
-        <Stack.Screen name="reading/group" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
-        <Stack.Screen name="reading/edit" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
+        <Stack.Screen
+          name="reading/new"
+          options={{ presentation: 'modal', animation: 'slide_from_bottom' }}
+        />
+        <Stack.Screen
+          name="reading/group"
+          options={{ presentation: 'modal', animation: 'slide_from_bottom' }}
+        />
+        <Stack.Screen
+          name="reading/edit"
+          options={{ presentation: 'modal', animation: 'slide_from_bottom' }}
+        />
         <Stack.Screen name="settings/point-rules" options={{ animation: 'slide_from_right' }} />
         <Stack.Screen name="settings/point-rules/form" options={{ presentation: 'modal' }} />
         <Stack.Screen name="settings/points-config" options={{ animation: 'slide_from_right' }} />
@@ -141,10 +188,24 @@ function RootLayoutNav() {
         <Stack.Screen name="settings/terms" options={{ animation: 'slide_from_right' }} />
         <Stack.Screen name="settings/terms/form" options={{ presentation: 'modal' }} />
         <Stack.Screen name="settings/security" options={{ animation: 'slide_from_right' }} />
-        <Stack.Screen name="points/give" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
-        <Stack.Screen name="board" options={{ headerShown: false, gestureEnabled: false, animation: 'fade' }} />
+        <Stack.Screen
+          name="points/give"
+          options={{ presentation: 'modal', animation: 'slide_from_bottom' }}
+        />
+        <Stack.Screen
+          name="board"
+          options={{ headerShown: false, gestureEnabled: false, animation: 'fade' }}
+        />
       </Stack>
       <StatusBar style="dark" />
+      <Snackbar
+        visible={visible}
+        message={message}
+        variant={variant}
+        actionLabel={actionLabel}
+        onAction={onAction}
+        onDismiss={hideSnackbar}
+      />
     </>
   );
 }

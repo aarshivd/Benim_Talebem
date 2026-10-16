@@ -4,13 +4,7 @@
  */
 
 import React, { useState } from 'react';
-import {
-  View,
-  StyleSheet,
-  FlatList,
-  Pressable,
-  RefreshControl,
-} from 'react-native';
+import { View, StyleSheet, FlatList, Pressable, RefreshControl } from 'react-native';
 import { useRouter } from 'expo-router';
 
 import { useTheme } from '@/theme';
@@ -38,9 +32,7 @@ export default function GroupsScreen() {
 
   const { data: allGroups = [], isLoading, refetch } = useGroupsWithCounts();
 
-  const filtered = allGroups.filter((g) =>
-    segment === 'active' ? !g.isArchived : g.isArchived,
-  );
+  const filtered = allGroups.filter((g) => (segment === 'active' ? !g.isArchived : g.isArchived));
 
   const renderGroup = ({ item }: { item: (typeof filtered)[number] }) => {
     const colorItem = GroupPalette[item.color] ?? GroupPalette[0];
@@ -62,21 +54,36 @@ export default function GroupsScreen() {
         accessibilityLabel={item.name}
       >
         {/* Sol renk şeridi */}
-        <View style={[styles.colorStripe, { backgroundColor: colorItem.bg, borderRightColor: colorItem.border }]}>
+        <View
+          style={[
+            styles.colorStripe,
+            { backgroundColor: colorItem.bg, borderRightColor: colorItem.border },
+          ]}
+        >
           <Text style={{ fontSize: 28 }}>{item.emoji}</Text>
         </View>
 
         {/* İçerik */}
-        <View style={[styles.cardContent, { paddingVertical: spacing.md, paddingHorizontal: spacing.base }]}>
+        <View
+          style={[
+            styles.cardContent,
+            { paddingVertical: spacing.md, paddingHorizontal: spacing.base },
+          ]}
+        >
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
             <Text variant="bodySemi" color={colors.ink} numberOfLines={1} style={{ flex: 1 }}>
               {item.name}
             </Text>
-            {item.isArchived && (
-              <Badge label="Arşiv" variant="neutral" />
-            )}
+            {item.isArchived && <Badge label="Arşiv" variant="neutral" />}
           </View>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm, marginTop: spacing.xs }}>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: spacing.sm,
+              marginTop: spacing.xs,
+            }}
+          >
             <View
               style={{
                 backgroundColor: colorItem.bg,
@@ -97,7 +104,9 @@ export default function GroupsScreen() {
 
         {/* Ok */}
         <View style={{ justifyContent: 'center', paddingRight: spacing.base }}>
-          <Text variant="body" color={colors.muted}>›</Text>
+          <Text variant="body" color={colors.muted}>
+            ›
+          </Text>
         </View>
       </Pressable>
     );
@@ -117,9 +126,7 @@ export default function GroupsScreen() {
         data={filtered}
         keyExtractor={(item) => item.id}
         renderItem={renderGroup}
-        refreshControl={
-          <RefreshControl refreshing={isLoading} onRefresh={refetch} />
-        }
+        refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refetch} />}
         contentContainerStyle={{ flexGrow: 1, paddingBottom: 100 }}
         ListEmptyComponent={
           <EmptyState
@@ -132,11 +139,7 @@ export default function GroupsScreen() {
       />
 
       {segment === 'active' && (
-        <FAB
-          icon="add"
-          onPress={() => router.push('/group/form')}
-          accessibilityLabel="Grup ekle"
-        />
+        <FAB icon="add" onPress={() => router.push('/group/form')} accessibilityLabel="Grup ekle" />
       )}
     </Screen>
   );

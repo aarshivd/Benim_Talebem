@@ -44,7 +44,11 @@ function DaySelector({ value, onChange }: { value: string; onChange: (v: string)
   });
 
   return (
-    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: spacing.sm }}>
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      contentContainerStyle={{ gap: spacing.sm }}
+    >
       {days.map((d) => {
         const active = d === value;
         const label = d === today ? 'Bugün' : d.slice(5).replace('-', '/');
@@ -64,7 +68,9 @@ function DaySelector({ value, onChange }: { value: string; onChange: (v: string)
               },
             ]}
           >
-            <Text variant="captionSemi" color={active ? colors.white : colors.muted}>{label}</Text>
+            <Text variant="captionSemi" color={active ? colors.white : colors.muted}>
+              {label}
+            </Text>
           </Pressable>
         );
       })}
@@ -84,7 +90,7 @@ export default function NewReadingScreen() {
 
   const recordReading = useRecordReading();
   const { data: groups = [] } = useGroups();
-  
+
   const [selectedGroupId, setSelectedGroupId] = useState('');
   const [selectedStudentId, setSelectedStudentId] = useState(paramStudentId ?? '');
 
@@ -97,7 +103,7 @@ export default function NewReadingScreen() {
     }
     return '';
   }); // studentBook.id
-  
+
   const [toPage, setToPage] = useState(() => {
     if (paramBookId && studentBooks.length > 0) {
       const found = studentBooks.find((sb) => sb.bookId === paramBookId);
@@ -106,9 +112,11 @@ export default function NewReadingScreen() {
     return 0;
   });
   const [date, setDate] = useState(todayLocal());
-  const [result, setResult] = useState<{ pagesRead: number; points: number; finished: boolean } | null>(null);
-
-
+  const [result, setResult] = useState<{
+    pagesRead: number;
+    points: number;
+    finished: boolean;
+  } | null>(null);
 
   // Seçili studentBook
   const selectedSB = studentBooks.find((sb) => sb.id === selectedStudentBookId);
@@ -116,8 +124,6 @@ export default function NewReadingScreen() {
   const bookTotalPages = selectedSB?.book?.totalPages ?? 0;
   const pagesReadPreview = Math.max(0, toPage - fromPage);
   const isBookParamFixed = !!paramStudentId && !!paramBookId;
-
-
 
   const handleSave = async () => {
     if (!selectedStudentId || !selectedSB || !selectedSB.book) {
@@ -157,7 +163,14 @@ export default function NewReadingScreen() {
           {result.points > 0 ? `+${result.points} puan kazandı!` : 'Puan yok (hedef altında)'}
         </Text>
         <View style={{ marginTop: spacing.xxl, gap: spacing.md }}>
-          <Button label="Yeni Giriş Yap" onPress={() => { setResult(null); setToPage(fromPage); }} fullWidth />
+          <Button
+            label="Yeni Giriş Yap"
+            onPress={() => {
+              setResult(null);
+              setToPage(fromPage);
+            }}
+            fullWidth
+          />
           <Button label="Kapat" variant="ghost" onPress={() => router.back()} fullWidth />
         </View>
       </View>
@@ -165,39 +178,57 @@ export default function NewReadingScreen() {
   }
 
   return (
-    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
       <Screen title="Okuma Girişi" showBack scroll>
         <View style={{ gap: spacing.lg, paddingBottom: 40 }}>
           {/* Grup seçimi */}
           {!paramStudentId && (
             <View>
-              <Text variant="label" style={{ marginBottom: spacing.sm }}>Grup</Text>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: spacing.sm }}>
-                {groups.filter(g => !g.isArchived && g.deletedAt === null).map((g) => {
-                  const active = selectedGroupId === g.id;
-                  const colorItem = GroupPalette[g.color] ?? GroupPalette[0];
-                  return (
-                    <Pressable
-                      key={g.id}
-                      onPress={() => { setSelectedGroupId(g.id); setSelectedStudentId(''); setSelectedStudentBookId(''); }}
-                      style={[
-                        styles.groupChip,
-                        {
-                          backgroundColor: active ? colorItem.bg : colors.surface,
-                          borderColor: active ? colorItem.border : colors.border,
-                          borderRadius: radius.full,
-                          paddingHorizontal: spacing.md,
-                          paddingVertical: spacing.sm,
-                          borderWidth: 1,
-                        },
-                      ]}
-                    >
-                      <Text variant="captionSemi" style={{ color: active ? colorItem.text : colors.muted }}>
-                        {g.emoji} {g.name}
-                      </Text>
-                    </Pressable>
-                  );
-                })}
+              <Text variant="label" style={{ marginBottom: spacing.sm }}>
+                Grup
+              </Text>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={{ gap: spacing.sm }}
+              >
+                {groups
+                  .filter((g) => !g.isArchived && g.deletedAt === null)
+                  .map((g) => {
+                    const active = selectedGroupId === g.id;
+                    const colorItem = GroupPalette[g.color] ?? GroupPalette[0];
+                    return (
+                      <Pressable
+                        key={g.id}
+                        onPress={() => {
+                          setSelectedGroupId(g.id);
+                          setSelectedStudentId('');
+                          setSelectedStudentBookId('');
+                        }}
+                        style={[
+                          styles.groupChip,
+                          {
+                            backgroundColor: active ? colorItem.bg : colors.surface,
+                            borderColor: active ? colorItem.border : colors.border,
+                            borderRadius: radius.full,
+                            paddingHorizontal: spacing.md,
+                            paddingVertical: spacing.sm,
+                            borderWidth: 1,
+                          },
+                        ]}
+                      >
+                        <Text
+                          variant="captionSemi"
+                          style={{ color: active ? colorItem.text : colors.muted }}
+                        >
+                          {g.emoji} {g.name}
+                        </Text>
+                      </Pressable>
+                    );
+                  })}
               </ScrollView>
             </View>
           )}
@@ -205,14 +236,23 @@ export default function NewReadingScreen() {
           {/* Talebe seçimi */}
           {!paramStudentId && selectedGroupId && (
             <View>
-              <Text variant="label" style={{ marginBottom: spacing.sm }}>Talebe</Text>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: spacing.sm }}>
+              <Text variant="label" style={{ marginBottom: spacing.sm }}>
+                Talebe
+              </Text>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={{ gap: spacing.sm }}
+              >
                 {students.map((s) => {
                   const active = selectedStudentId === s.id;
                   return (
                     <Pressable
                       key={s.id}
-                      onPress={() => { setSelectedStudentId(s.id); setSelectedStudentBookId(''); }}
+                      onPress={() => {
+                        setSelectedStudentId(s.id);
+                        setSelectedStudentBookId('');
+                      }}
                       style={[
                         styles.groupChip,
                         {
@@ -238,36 +278,55 @@ export default function NewReadingScreen() {
           {/* Kitap seçimi */}
           {selectedStudentId && !isBookParamFixed && (
             <View>
-              <Text variant="label" style={{ marginBottom: spacing.sm }}>Kitap</Text>
+              <Text variant="label" style={{ marginBottom: spacing.sm }}>
+                Kitap
+              </Text>
               {studentBooks.length === 0 ? (
-                <Text variant="caption" color={colors.muted}>Bu talebeye henüz kitap atanmamış.</Text>
+                <Text variant="caption" color={colors.muted}>
+                  Bu talebeye henüz kitap atanmamış.
+                </Text>
               ) : (
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: spacing.sm }}>
-                  {studentBooks.filter(sb => sb.status !== 'paused').map((sb) => {
-                    const active = selectedStudentBookId === sb.id;
-                    return (
-                      <Pressable
-                        key={sb.id}
-                        onPress={() => { setSelectedStudentBookId(sb.id); setToPage(sb.currentPage); }}
-                        style={[
-                          styles.groupChip,
-                          {
-                            backgroundColor: active ? colors.primarySoft : colors.surface,
-                            borderColor: active ? colors.primary : colors.border,
-                            borderRadius: radius.lg,
-                            padding: spacing.sm,
-                            borderWidth: 1,
-                            maxWidth: 180,
-                          },
-                        ]}
-                      >
-                        <Text variant="captionSemi" color={active ? colors.primary : colors.muted} numberOfLines={2}>
-                          {sb.book?.title}
-                        </Text>
-                        <Text variant="caption" color={colors.muted}>{sb.currentPage}/{sb.book?.totalPages} s.</Text>
-                      </Pressable>
-                    );
-                  })}
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={{ gap: spacing.sm }}
+                >
+                  {studentBooks
+                    .filter((sb) => sb.status !== 'paused')
+                    .map((sb) => {
+                      const active = selectedStudentBookId === sb.id;
+                      return (
+                        <Pressable
+                          key={sb.id}
+                          onPress={() => {
+                            setSelectedStudentBookId(sb.id);
+                            setToPage(sb.currentPage);
+                          }}
+                          style={[
+                            styles.groupChip,
+                            {
+                              backgroundColor: active ? colors.primarySoft : colors.surface,
+                              borderColor: active ? colors.primary : colors.border,
+                              borderRadius: radius.lg,
+                              padding: spacing.sm,
+                              borderWidth: 1,
+                              maxWidth: 180,
+                            },
+                          ]}
+                        >
+                          <Text
+                            variant="captionSemi"
+                            color={active ? colors.primary : colors.muted}
+                            numberOfLines={2}
+                          >
+                            {sb.book?.title}
+                          </Text>
+                          <Text variant="caption" color={colors.muted}>
+                            {sb.currentPage}/{sb.book?.totalPages} s.
+                          </Text>
+                        </Pressable>
+                      );
+                    })}
                 </ScrollView>
               )}
             </View>
@@ -275,7 +334,16 @@ export default function NewReadingScreen() {
 
           {/* Mevcut konum */}
           {selectedSB && (
-            <View style={[styles.infoBox, { backgroundColor: colors.primarySoft, borderRadius: radius.lg, padding: spacing.base }]}>
+            <View
+              style={[
+                styles.infoBox,
+                {
+                  backgroundColor: colors.primarySoft,
+                  borderRadius: radius.lg,
+                  padding: spacing.base,
+                },
+              ]}
+            >
               <Text variant="captionSemi" color={colors.primary}>
                 📍 Şu an {fromPage}. sayfada — {selectedSB.book?.title}
               </Text>
@@ -285,7 +353,9 @@ export default function NewReadingScreen() {
           {/* Sayfa girişi */}
           {selectedSB && (
             <View>
-              <Text variant="label" style={{ marginBottom: spacing.sm }}>Bugün kaçıncı sayfaya kadar okudu?</Text>
+              <Text variant="label" style={{ marginBottom: spacing.sm }}>
+                Bugün kaçıncı sayfaya kadar okudu?
+              </Text>
               <NumberStepper
                 value={toPage}
                 onChange={setToPage}
@@ -294,7 +364,11 @@ export default function NewReadingScreen() {
                 step={1}
               />
               {toPage > fromPage && (
-                <Text variant="captionSemi" color={colors.success} style={{ marginTop: spacing.xs, textAlign: 'center' }}>
+                <Text
+                  variant="captionSemi"
+                  color={colors.success}
+                  style={{ marginTop: spacing.xs, textAlign: 'center' }}
+                >
                   Bugün {pagesReadPreview} sayfa okundu
                 </Text>
               )}
@@ -303,7 +377,9 @@ export default function NewReadingScreen() {
 
           {/* Tarih */}
           <View>
-            <Text variant="label" style={{ marginBottom: spacing.sm }}>Tarih</Text>
+            <Text variant="label" style={{ marginBottom: spacing.sm }}>
+              Tarih
+            </Text>
             <DaySelector value={date} onChange={setDate} />
           </View>
 
@@ -311,7 +387,12 @@ export default function NewReadingScreen() {
           <Button
             label={recordReading.isPending ? tr.common.saving : 'Kaydet'}
             onPress={handleSave}
-            disabled={!selectedStudentId || !selectedStudentBookId || toPage <= fromPage || recordReading.isPending}
+            disabled={
+              !selectedStudentId ||
+              !selectedStudentBookId ||
+              toPage <= fromPage ||
+              recordReading.isPending
+            }
             fullWidth
           />
         </View>

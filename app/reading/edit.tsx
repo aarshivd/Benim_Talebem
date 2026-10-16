@@ -35,7 +35,10 @@ export default function EditReadingScreen() {
   };
 
   return (
-    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
       <Screen title="Kaydı Düzenle" showBack>
         <View style={{ gap: spacing.lg, paddingBottom: 40 }}>
           <Text variant="label">Hedef Sayfa</Text>

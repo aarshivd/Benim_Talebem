@@ -28,15 +28,19 @@ export default function AssignBookScreen() {
   // Zaten atanmış book ID'leri
   const assignedBookIds = new Set(studentBooks.map((sb) => sb.bookId));
 
-  const filtered = allBooks.filter((b) =>
-    !search.trim() || b.title.toLowerCase().includes(search.toLowerCase()),
+  const filtered = allBooks.filter(
+    (b) => !search.trim() || b.title.toLowerCase().includes(search.toLowerCase()),
   );
 
   const handleAssign = async () => {
     if (!selectedBookId) return;
     const sp = parseInt(startPage, 10);
     try {
-      await assignBook.mutateAsync({ studentId, bookId: selectedBookId, startPage: isNaN(sp) ? 0 : sp });
+      await assignBook.mutateAsync({
+        studentId,
+        bookId: selectedBookId,
+        startPage: isNaN(sp) ? 0 : sp,
+      });
       router.back();
     } catch (e: any) {
       Alert.alert('Hata', e.message ?? tr.snackbar.error);
@@ -49,7 +53,9 @@ export default function AssignBookScreen() {
 
     return (
       <Pressable
-        onPress={() => { if (!isAssigned) setSelectedBookId(item.id); }}
+        onPress={() => {
+          if (!isAssigned) setSelectedBookId(item.id);
+        }}
         disabled={isAssigned}
         style={[
           styles.bookRow,
@@ -65,31 +71,46 @@ export default function AssignBookScreen() {
         ]}
       >
         <View style={{ flex: 1 }}>
-          <Text variant="bodySemi" color={colors.ink}>{item.title}</Text>
-          {item.author ? <Text variant="caption" color={colors.muted}>{item.author}</Text> : null}
-          <Text variant="caption" color={colors.muted}>{item.totalPages} sayfa</Text>
-          {isAssigned && <Text variant="caption" color={colors.warning}>Zaten atanmış</Text>}
+          <Text variant="bodySemi" color={colors.ink}>
+            {item.title}
+          </Text>
+          {item.author ? (
+            <Text variant="caption" color={colors.muted}>
+              {item.author}
+            </Text>
+          ) : null}
+          <Text variant="caption" color={colors.muted}>
+            {item.totalPages} sayfa
+          </Text>
+          {isAssigned && (
+            <Text variant="caption" color={colors.warning}>
+              Zaten atanmış
+            </Text>
+          )}
         </View>
-        {isSelected && <Text variant="body" color={colors.primary}>✓</Text>}
+        {isSelected && (
+          <Text variant="body" color={colors.primary}>
+            ✓
+          </Text>
+        )}
       </Pressable>
     );
   };
 
   return (
     <Screen title="Kitap Ata" showBack>
-      <Input
-        placeholder="Kitap ara…"
-        value={search}
-        onChangeText={setSearch}
-        leftIcon="search"
-      />
+      <Input placeholder="Kitap ara…" value={search} onChangeText={setSearch} leftIcon="search" />
       <View style={{ marginVertical: spacing.md }}>
         <FlatList
           data={filtered}
           keyExtractor={(b) => b.id}
           renderItem={renderBook}
           scrollEnabled={false}
-          ListEmptyComponent={<Text variant="body" color={colors.muted} align="center">Kitap bulunamadı.</Text>}
+          ListEmptyComponent={
+            <Text variant="body" color={colors.muted} align="center">
+              Kitap bulunamadı.
+            </Text>
+          }
         />
       </View>
 

@@ -31,14 +31,14 @@ export default function BoardScreen() {
   const [pinInput, setPinInput] = useState('');
 
   const { data: groups = [] } = useGroups();
-  const activeGroups = groups.filter(g => !g.isArchived && !g.deletedAt);
+  const activeGroups = groups.filter((g) => !g.isArchived && !g.deletedAt);
   const { data: activeTerm } = useActiveTerm();
 
   // Auto-rotate logic
   useEffect(() => {
     if (!autoRotate) return;
     const interval = setInterval(() => {
-      setScope(prev => (prev === 'daily' ? 'term' : 'daily'));
+      setScope((prev) => (prev === 'daily' ? 'term' : 'daily'));
     }, 10000); // 10 saniye
     return () => clearInterval(interval);
   }, [autoRotate]);
@@ -68,22 +68,22 @@ export default function BoardScreen() {
   const allRewards = rankingData?.allRewards ?? [];
 
   const top3 = [
-    rankedRows.find(r => r.rank === 1) ?? null,
-    rankedRows.find(r => r.rank === 2) ?? null,
-    rankedRows.find(r => r.rank === 3) ?? null,
+    rankedRows.find((r) => r.rank === 1) ?? null,
+    rankedRows.find((r) => r.rank === 2) ?? null,
+    rankedRows.find((r) => r.rank === 3) ?? null,
   ];
 
-  const restRows = rankedRows.filter(r => r.rank === null || r.rank > 3);
+  const restRows = rankedRows.filter((r) => r.rank === null || r.rank > 3);
 
   const handlePinPress = (key: string) => {
     if (pinInput.length < 6) {
-      setPinInput(prev => prev + key);
+      setPinInput((prev) => prev + key);
       setPinError('');
     }
   };
 
   const handlePinDelete = () => {
-    setPinInput(prev => prev.slice(0, -1));
+    setPinInput((prev) => prev.slice(0, -1));
     setPinError('');
   };
 
@@ -91,7 +91,7 @@ export default function BoardScreen() {
     if (pinInput.length >= 4) {
       // PinPad uses 4-6 pins. Wait, usually it auto-submits at 6 or there is a confirm button.
       // But verifyPin is async and can be checked. We'll check every time length >= 4, if error, we don't clear until it hits 6 maybe?
-      // Better to check automatically when length is 4-6. Let's just provide a simple submit button or auto check when length = 4 if all pins are 4? 
+      // Better to check automatically when length is 4-6. Let's just provide a simple submit button or auto check when length = 4 if all pins are 4?
       // It's better to verify and if correct, exit. If length reaches 6 and still wrong, show error.
       const checkPin = async () => {
         try {
@@ -112,9 +112,9 @@ export default function BoardScreen() {
     }
   }, [pinInput, router]);
 
-  const renderItem = ({ item }: { item: typeof restRows[0] }) => {
+  const renderItem = ({ item }: { item: (typeof restRows)[0] }) => {
     const isZero = item.points <= 0;
-    const group = groups.find(g => g.id === item.groupId);
+    const group = groups.find((g) => g.id === item.groupId);
     const colorItem = GroupPalette[group?.color ?? 0] ?? GroupPalette[0];
     const studentRewards = earnedRewards[item.studentId] ?? [];
 
@@ -129,30 +129,46 @@ export default function BoardScreen() {
             marginBottom: spacing.sm,
             opacity: isZero ? 0.6 : 1,
             ...shadows.sm,
-          }
+          },
         ]}
       >
         <View style={{ width: 40, alignItems: 'center', marginRight: spacing.sm }}>
-          <Text variant="heading" color={colors.muted}>{item.rank ?? '—'}</Text>
+          <Text variant="heading" color={colors.muted}>
+            {item.rank ?? '—'}
+          </Text>
         </View>
         <Avatar name={item.name} emoji={item.avatar ?? undefined} size="md" color={colorItem.bg} />
         <View style={{ flex: 1, marginLeft: spacing.md }}>
-          <Text variant="heading" color={colors.ink}>{item.name}</Text>
+          <Text variant="heading" color={colors.ink}>
+            {item.name}
+          </Text>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4 }}>
-            {group && <Text variant="body" color={colors.muted}>{group.emoji} {group.name}</Text>}
+            {group && (
+              <Text variant="body" color={colors.muted}>
+                {group.emoji} {group.name}
+              </Text>
+            )}
             {studentRewards.length > 0 && (
               <View style={{ flexDirection: 'row', gap: 2 }}>
-                {studentRewards.map(rid => {
-                  const r = allRewards.find(x => x.id === rid);
-                  return <Text key={rid} style={{ fontSize: 16 }}>{r?.icon ?? '🏆'}</Text>;
+                {studentRewards.map((rid) => {
+                  const r = allRewards.find((x) => x.id === rid);
+                  return (
+                    <Text key={rid} style={{ fontSize: 16 }}>
+                      {r?.icon ?? '🏆'}
+                    </Text>
+                  );
                 })}
               </View>
             )}
           </View>
         </View>
         <View style={{ alignItems: 'flex-end' }}>
-          <Text variant="heading" color={colors.primary}>{item.points} p</Text>
-          <Text variant="bodySemi" color={colors.muted}>{item.pages} sayfa</Text>
+          <Text variant="heading" color={colors.primary}>
+            {item.points} p
+          </Text>
+          <Text variant="bodySemi" color={colors.muted}>
+            {item.pages} sayfa
+          </Text>
         </View>
       </View>
     );
@@ -161,9 +177,26 @@ export default function BoardScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg, paddingTop: 40 }}>
       {/* Top Bar */}
-      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: spacing.base, marginBottom: spacing.md }}>
-        <IconButton icon="lock-closed" onPress={() => { setPinInput(''); setPinError(''); setShowExitPin(true); }} color={colors.ink} accessibilityLabel="Çıkış (PIN ile)" />
-        
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          paddingHorizontal: spacing.base,
+          marginBottom: spacing.md,
+        }}
+      >
+        <IconButton
+          icon="lock-closed"
+          onPress={() => {
+            setPinInput('');
+            setPinError('');
+            setShowExitPin(true);
+          }}
+          color={colors.ink}
+          accessibilityLabel="Çıkış (PIN ile)"
+        />
+
         <View style={{ width: 200 }}>
           <Segmented
             options={[
@@ -171,12 +204,17 @@ export default function BoardScreen() {
               { label: 'Dönemlik', value: 'term' },
             ]}
             selected={scope}
-            onSelect={(s) => { setScope(s as 'daily' | 'term'); setAutoRotate(false); }}
+            onSelect={(s) => {
+              setScope(s as 'daily' | 'term');
+              setAutoRotate(false);
+            }}
           />
         </View>
-        
+
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <Text variant="captionSemi" color={colors.muted} style={{ marginRight: 8 }}>Oto Döngü</Text>
+          <Text variant="captionSemi" color={colors.muted} style={{ marginRight: 8 }}>
+            Oto Döngü
+          </Text>
           <SwitchRow label="" value={autoRotate} onValueChange={setAutoRotate} />
         </View>
       </View>
@@ -186,7 +224,7 @@ export default function BoardScreen() {
         keyExtractor={(item) => item.studentId}
         renderItem={renderItem}
         ListHeaderComponent={
-          top3.some(x => x !== null) ? (
+          top3.some((x) => x !== null) ? (
             <View style={{ marginVertical: spacing.xl }}>
               <Podium top3={top3} onPress={() => {}} />
             </View>
@@ -196,26 +234,58 @@ export default function BoardScreen() {
       />
 
       <Modal visible={showExitPin} transparent animationType="fade">
-        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.8)', justifyContent: 'center', padding: spacing.xl }}>
-          <View style={{ backgroundColor: colors.surface, padding: spacing.xl, borderRadius: radius.xl, alignItems: 'center' }}>
-            <Text variant="heading" color={colors.ink} style={{ marginBottom: spacing.sm }}>Pano Modundan Çık</Text>
-            <Text variant="body" color={colors.muted} style={{ marginBottom: spacing.xl, textAlign: 'center' }}>
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: 'rgba(0,0,0,0.8)',
+            justifyContent: 'center',
+            padding: spacing.xl,
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: colors.surface,
+              padding: spacing.xl,
+              borderRadius: radius.xl,
+              alignItems: 'center',
+            }}
+          >
+            <Text variant="heading" color={colors.ink} style={{ marginBottom: spacing.sm }}>
+              Pano Modundan Çık
+            </Text>
+            <Text
+              variant="body"
+              color={colors.muted}
+              style={{ marginBottom: spacing.xl, textAlign: 'center' }}
+            >
               Çıkmak için hocanın PIN kodu gereklidir. Ekranda okuma verileri değiştirilemez.
             </Text>
 
             <View style={{ flexDirection: 'row', gap: 12, marginBottom: spacing.xl }}>
               {Array.from({ length: 6 }).map((_, i) => (
-                <View key={i} style={[styles.pinDot, { backgroundColor: i < pinInput.length ? colors.primary : colors.border }]} />
+                <View
+                  key={i}
+                  style={[
+                    styles.pinDot,
+                    { backgroundColor: i < pinInput.length ? colors.primary : colors.border },
+                  ]}
+                />
               ))}
             </View>
 
-            {!!pinError && <Text variant="caption" color={colors.danger} style={{ marginBottom: spacing.md }}>{pinError}</Text>}
+            {!!pinError && (
+              <Text variant="caption" color={colors.danger} style={{ marginBottom: spacing.md }}>
+                {pinError}
+              </Text>
+            )}
 
             <PinPad onKeyPress={handlePinPress} onDelete={handlePinDelete} />
-            
+
             <View style={{ marginTop: spacing.xl }}>
               <Pressable onPress={() => setShowExitPin(false)}>
-                <Text variant="bodySemi" color={colors.primary}>İptal</Text>
+                <Text variant="bodySemi" color={colors.primary}>
+                  İptal
+                </Text>
               </Pressable>
             </View>
           </View>
@@ -234,5 +304,5 @@ const styles = StyleSheet.create({
     width: 16,
     height: 16,
     borderRadius: 8,
-  }
+  },
 });

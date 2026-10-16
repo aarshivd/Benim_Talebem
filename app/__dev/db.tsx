@@ -35,10 +35,7 @@ interface TestResult {
   error?: string;
 }
 
-async function run(
-  name: string,
-  fn: () => Promise<void>,
-): Promise<TestResult> {
+async function run(name: string, fn: () => Promise<void>): Promise<TestResult> {
   try {
     await fn();
     return { name, passed: true };
@@ -64,197 +61,251 @@ async function runAllTests(): Promise<TestResult[]> {
   let sbId = '';
 
   // ── 1. Grup oluştur ──────────────────────────────────────────────────────
-  results.push(await run('Grup oluştur', async () => {
-    const g = await groupsRepo.createGroup(db, {
-      name: TEST_GROUP_NAME,
-      level: 'ortaokul',
-      color: 0,
-      emoji: '📚',
-      isArchived: false,
-      sortOrder: 99,
-    });
-    if (!g.id) throw new Error('id yok');
-    groupId = g.id;
-  }));
+  results.push(
+    await run('Grup oluştur', async () => {
+      const g = await groupsRepo.createGroup(db, {
+        name: TEST_GROUP_NAME,
+        level: 'ortaokul',
+        color: 0,
+        emoji: '📚',
+        isArchived: false,
+        sortOrder: 99,
+      });
+      if (!g.id) throw new Error('id yok');
+      groupId = g.id;
+    }),
+  );
 
   // ── 2. Öğrenci oluştur ───────────────────────────────────────────────────
-  results.push(await run('Öğrenci oluştur', async () => {
-    const s = await studentsRepo.createStudent(db, {
-      groupId,
-      firstName: 'Test',
-      lastName: 'Talebe',
-      isActive: true,
-    });
-    if (!s.id) throw new Error('id yok');
-    studentId = s.id;
-  }));
+  results.push(
+    await run('Öğrenci oluştur', async () => {
+      const s = await studentsRepo.createStudent(db, {
+        groupId,
+        firstName: 'Test',
+        lastName: 'Talebe',
+        isActive: true,
+      });
+      if (!s.id) throw new Error('id yok');
+      studentId = s.id;
+    }),
+  );
 
   // ── 3. Kitap oluştur ─────────────────────────────────────────────────────
-  results.push(await run('Kitap oluştur', async () => {
-    const b = await booksRepo.createBook(db, {
-      title: TEST_BOOK_TITLE,
-      totalPages: 200,
-    });
-    if (!b.id) throw new Error('id yok');
-    bookId = b.id;
-  }));
+  results.push(
+    await run('Kitap oluştur', async () => {
+      const b = await booksRepo.createBook(db, {
+        title: TEST_BOOK_TITLE,
+        totalPages: 200,
+      });
+      if (!b.id) throw new Error('id yok');
+      bookId = b.id;
+    }),
+  );
 
   // ── 4. Öğrenci-Kitap eşleştir ────────────────────────────────────────────
-  results.push(await run('Öğrenci-Kitap eşleştir', async () => {
-    const sb = await studentBooksRepo.createStudentBook(db, {
-      studentId,
-      bookId,
-      currentPage: 0,
-      status: 'reading',
-      startedOn: today,
-    });
-    if (!sb.id) throw new Error('id yok');
-    sbId = sb.id;
-  }));
-
-  // ── 5. Benzersiz kısıt ihlali (aynı student+book) ────────────────────────
-  results.push(await run('Benzersiz kısıt ihlali (student+book)', async () => {
-    let threw = false;
-    try {
-      await studentBooksRepo.createStudentBook(db, {
+  results.push(
+    await run('Öğrenci-Kitap eşleştir', async () => {
+      const sb = await studentBooksRepo.createStudentBook(db, {
         studentId,
         bookId,
         currentPage: 0,
         status: 'reading',
         startedOn: today,
       });
-    } catch {
-      threw = true;
-    }
-    if (!threw) throw new Error('Kısıt ihlali bekleniyor, hata gelmedi');
-  }));
+      if (!sb.id) throw new Error('id yok');
+      sbId = sb.id;
+    }),
+  );
+
+  // ── 5. Benzersiz kısıt ihlali (aynı student+book) ────────────────────────
+  results.push(
+    await run('Benzersiz kısıt ihlali (student+book)', async () => {
+      let threw = false;
+      try {
+        await studentBooksRepo.createStudentBook(db, {
+          studentId,
+          bookId,
+          currentPage: 0,
+          status: 'reading',
+          startedOn: today,
+        });
+      } catch {
+        threw = true;
+      }
+      if (!threw) throw new Error('Kısıt ihlali bekleniyor, hata gelmedi');
+    }),
+  );
 
   // ── 6. Okuma kaydı ekle ──────────────────────────────────────────────────
-  results.push(await run('Okuma kaydı ekle', async () => {
-    const log = await readingLogsRepo.createReadingLog(db, {
-      studentId,
-      bookId,
-      date: today,
-      fromPage: 0,
-      toPage: 30,
-      pagesRead: 30,
-    });
-    if (!log.id) throw new Error('id yok');
+  results.push(
+    await run('Okuma kaydı ekle', async () => {
+      const log = await readingLogsRepo.createReadingLog(db, {
+        studentId,
+        bookId,
+        date: today,
+        fromPage: 0,
+        toPage: 30,
+        pagesRead: 30,
+      });
+      if (!log.id) throw new Error('id yok');
 
-    // currentPage güncelle
-    await studentBooksRepo.updateStudentBook(db, sbId, { currentPage: 30 });
-  }));
+      // currentPage güncelle
+      await studentBooksRepo.updateStudentBook(db, sbId, { currentPage: 30 });
+    }),
+  );
 
   // ── 7. Günlük toplam sayfa ───────────────────────────────────────────────
-  results.push(await run('Günlük toplam sayfa', async () => {
-    const total = await readingLogsRepo.sumPagesByStudentDay(db, studentId, today);
-    if (total !== 30) throw new Error(`Beklenen 30, gelen ${total}`);
-  }));
+  results.push(
+    await run('Günlük toplam sayfa', async () => {
+      const total = await readingLogsRepo.sumPagesByStudentDay(db, studentId, today);
+      if (total !== 30) throw new Error(`Beklenen 30, gelen ${total}`);
+    }),
+  );
 
   // ── 8. Okuma puanı upsert ────────────────────────────────────────────────
-  results.push(await run('Okuma puanı upsert', async () => {
-    await pointEventsRepo.upsertReadingEvent(db, studentId, today, 3, 'Okuma puanı');
-    const evts = await db.select().from(pointEvents)
-      .where(and(eq(pointEvents.studentId, studentId), eq(pointEvents.source, 'reading'), isNull(pointEvents.deletedAt)));
-    if (evts.length !== 1) throw new Error(`Beklenen 1 event, gelen ${evts.length}`);
-    if (evts[0].points !== 3) throw new Error(`Beklenen 3, gelen ${evts[0].points}`);
-  }));
+  results.push(
+    await run('Okuma puanı upsert', async () => {
+      await pointEventsRepo.upsertReadingEvent(db, studentId, today, 3, 'Okuma puanı');
+      const evts = await db
+        .select()
+        .from(pointEvents)
+        .where(
+          and(
+            eq(pointEvents.studentId, studentId),
+            eq(pointEvents.source, 'reading'),
+            isNull(pointEvents.deletedAt),
+          ),
+        );
+      if (evts.length !== 1) throw new Error(`Beklenen 1 event, gelen ${evts.length}`);
+      if (evts[0].points !== 3) throw new Error(`Beklenen 3, gelen ${evts[0].points}`);
+    }),
+  );
 
   // ── 9. Okuma puanı tekrar upsert (güncelleme) ────────────────────────────
-  results.push(await run('Okuma puanı güncelle (upsert)', async () => {
-    await pointEventsRepo.upsertReadingEvent(db, studentId, today, 5, 'Okuma puanı güncellendi');
-    const evts = await db.select().from(pointEvents)
-      .where(and(eq(pointEvents.studentId, studentId), eq(pointEvents.source, 'reading'), isNull(pointEvents.deletedAt)));
-    if (evts[0].points !== 5) throw new Error(`Beklenen 5, gelen ${evts[0].points}`);
-  }));
+  results.push(
+    await run('Okuma puanı güncelle (upsert)', async () => {
+      await pointEventsRepo.upsertReadingEvent(db, studentId, today, 5, 'Okuma puanı güncellendi');
+      const evts = await db
+        .select()
+        .from(pointEvents)
+        .where(
+          and(
+            eq(pointEvents.studentId, studentId),
+            eq(pointEvents.source, 'reading'),
+            isNull(pointEvents.deletedAt),
+          ),
+        );
+      if (evts[0].points !== 5) throw new Error(`Beklenen 5, gelen ${evts[0].points}`);
+    }),
+  );
 
   // ── 10. Okuma puanı 0 → soft-delete ─────────────────────────────────────
-  results.push(await run('Okuma puanı 0 → soft-delete', async () => {
-    await pointEventsRepo.upsertReadingEvent(db, studentId, today, 0, '');
-    const evts = await db.select().from(pointEvents)
-      .where(and(eq(pointEvents.studentId, studentId), eq(pointEvents.source, 'reading'), isNull(pointEvents.deletedAt)));
-    if (evts.length !== 0) throw new Error(`Soft-delete çalışmadı, ${evts.length} kayıt kaldı`);
-  }));
+  results.push(
+    await run('Okuma puanı 0 → soft-delete', async () => {
+      await pointEventsRepo.upsertReadingEvent(db, studentId, today, 0, '');
+      const evts = await db
+        .select()
+        .from(pointEvents)
+        .where(
+          and(
+            eq(pointEvents.studentId, studentId),
+            eq(pointEvents.source, 'reading'),
+            isNull(pointEvents.deletedAt),
+          ),
+        );
+      if (evts.length !== 0) throw new Error(`Soft-delete çalışmadı, ${evts.length} kayıt kaldı`);
+    }),
+  );
 
   // ── 11. getTotals ─────────────────────────────────────────────────────────
-  results.push(await run('getTotals (sayfalar)', async () => {
-    // Önce puanı geri ekle
-    await pointEventsRepo.upsertReadingEvent(db, studentId, today, 4, 'Test puan');
+  results.push(
+    await run('getTotals (sayfalar)', async () => {
+      // Önce puanı geri ekle
+      await pointEventsRepo.upsertReadingEvent(db, studentId, today, 4, 'Test puan');
 
-    const totals = await pointEventsRepo.getTotals(db, {
-      from: today,
-      to: today,
-      groupId,
-    });
-    const mine = totals.find((t) => t.studentId === studentId);
-    if (!mine) throw new Error('Öğrenci totals\'da yok');
-    if (mine.points !== 4) throw new Error(`Beklenen puan 4, gelen ${mine.points}`);
-    if (mine.pages !== 30) throw new Error(`Beklenen sayfa 30, gelen ${mine.pages}`);
-  }));
+      const totals = await pointEventsRepo.getTotals(db, {
+        from: today,
+        to: today,
+        groupId,
+      });
+      const mine = totals.find((t) => t.studentId === studentId);
+      if (!mine) throw new Error("Öğrenci totals'da yok");
+      if (mine.points !== 4) throw new Error(`Beklenen puan 4, gelen ${mine.points}`);
+      if (mine.pages !== 30) throw new Error(`Beklenen sayfa 30, gelen ${mine.pages}`);
+    }),
+  );
 
   // ── 12. Transaction rollback ──────────────────────────────────────────────
-  results.push(await run('Transaction rollback', async () => {
-    let threw = false;
-    try {
-      await withTransaction(db, async (tx) => {
-        await tx.insert(books).values({
-          id: 'rollback-test-id',
-          title: '__ROLLBACK_TEST__',
-          totalPages: 1,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
+  results.push(
+    await run('Transaction rollback', async () => {
+      let threw = false;
+      try {
+        await withTransaction(db, async (tx) => {
+          await tx.insert(books).values({
+            id: 'rollback-test-id',
+            title: '__ROLLBACK_TEST__',
+            totalPages: 1,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          });
+          throw new Error('Kasıtlı hata — rollback testi');
         });
-        throw new Error('Kasıtlı hata — rollback testi');
-      });
-    } catch {
-      threw = true;
-    }
-    if (!threw) throw new Error('Transaction hata fırlatmadı');
-    // Rollback başarılıysa kayıt DB'de olmamalı
-    const rows = await db.select().from(books).where(eq(books.id, 'rollback-test-id'));
-    if (rows.length > 0) throw new Error('Rollback başarısız — kayıt kaldı!');
-  }));
+      } catch {
+        threw = true;
+      }
+      if (!threw) throw new Error('Transaction hata fırlatmadı');
+      // Rollback başarılıysa kayıt DB'de olmamalı
+      const rows = await db.select().from(books).where(eq(books.id, 'rollback-test-id'));
+      if (rows.length > 0) throw new Error('Rollback başarısız — kayıt kaldı!');
+    }),
+  );
 
   // ── 13. Soft-delete (öğrenci) ─────────────────────────────────────────────
-  results.push(await run('Soft-delete öğrenci', async () => {
-    await studentsRepo.softDeleteStudent(db, studentId);
-    const s = await studentsRepo.getStudent(db, studentId);
-    if (s !== null) throw new Error('Soft-delete sonrası hâlâ görünüyor');
-  }));
+  results.push(
+    await run('Soft-delete öğrenci', async () => {
+      await studentsRepo.softDeleteStudent(db, studentId);
+      const s = await studentsRepo.getStudent(db, studentId);
+      if (s !== null) throw new Error('Soft-delete sonrası hâlâ görünüyor');
+    }),
+  );
 
   // ── 14. Settings get/set ─────────────────────────────────────────────────
-  results.push(await run('Settings get/set', async () => {
-    await settingsRepo.setSetting(db, 'pages_per_point', 15);
-    const val = await settingsRepo.getSetting(db, 'pages_per_point', 10);
-    if (val !== 15) throw new Error(`Beklenen 15, gelen ${val}`);
-    // Geri al
-    await settingsRepo.setSetting(db, 'pages_per_point', 10);
-  }));
+  results.push(
+    await run('Settings get/set', async () => {
+      await settingsRepo.setSetting(db, 'pages_per_point', 15);
+      const val = await settingsRepo.getSetting(db, 'pages_per_point', 10);
+      if (val !== 15) throw new Error(`Beklenen 15, gelen ${val}`);
+      // Geri al
+      await settingsRepo.setSetting(db, 'pages_per_point', 10);
+    }),
+  );
 
   // ── 15. Dönem oluştur + aktif yap ────────────────────────────────────────
-  results.push(await run('Dönem oluştur + aktif yap', async () => {
-    const t1 = await termsRepo.createTerm(db, {
-      name: 'Test Dönem 1',
-      startDate: '2025-01-01',
-      endDate: '2025-06-30',
-      isActive: false,
-    });
-    const t2 = await termsRepo.createTerm(db, {
-      name: 'Test Dönem 2',
-      startDate: '2025-07-01',
-      endDate: '2025-12-31',
-      isActive: false,
-    });
-    await termsRepo.setActiveTerm(db, t1.id);
-    const active = await termsRepo.getActiveTerm(db);
-    if (active?.id !== t1.id) throw new Error('Aktif dönem yanlış');
-    await termsRepo.setActiveTerm(db, t2.id);
-    const active2 = await termsRepo.getActiveTerm(db);
-    if (active2?.id !== t2.id) throw new Error('Aktif dönem güncellenmedi');
-    // Temizle
-    await termsRepo.softDeleteTerm(db, t1.id);
-    await termsRepo.softDeleteTerm(db, t2.id);
-  }));
+  results.push(
+    await run('Dönem oluştur + aktif yap', async () => {
+      const t1 = await termsRepo.createTerm(db, {
+        name: 'Test Dönem 1',
+        startDate: '2025-01-01',
+        endDate: '2025-06-30',
+        isActive: false,
+      });
+      const t2 = await termsRepo.createTerm(db, {
+        name: 'Test Dönem 2',
+        startDate: '2025-07-01',
+        endDate: '2025-12-31',
+        isActive: false,
+      });
+      await termsRepo.setActiveTerm(db, t1.id);
+      const active = await termsRepo.getActiveTerm(db);
+      if (active?.id !== t1.id) throw new Error('Aktif dönem yanlış');
+      await termsRepo.setActiveTerm(db, t2.id);
+      const active2 = await termsRepo.getActiveTerm(db);
+      if (active2?.id !== t2.id) throw new Error('Aktif dönem güncellenmedi');
+      // Temizle
+      await termsRepo.softDeleteTerm(db, t1.id);
+      await termsRepo.softDeleteTerm(db, t2.id);
+    }),
+  );
 
   // ── TEMİZLİK ─────────────────────────────────────────────────────────────
   // Test verilerini temizle (grupları soft-delete et yeterli)
@@ -293,8 +344,15 @@ export default function DbTestScreen() {
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.bg }]}>
-      <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
-        <Text variant="heading" color={colors.primary}>🗄️ DB Testleri</Text>
+      <View
+        style={[
+          styles.header,
+          { backgroundColor: colors.surface, borderBottomColor: colors.border },
+        ]}
+      >
+        <Text variant="heading" color={colors.primary}>
+          🗄️ DB Testleri
+        </Text>
         <Pressable
           onPress={handleRun}
           disabled={running}
@@ -312,7 +370,12 @@ export default function DbTestScreen() {
       </View>
 
       {started && !running && (
-        <View style={[styles.summary, { backgroundColor: failed > 0 ? colors.dangerSoft : colors.successSoft }]}>
+        <View
+          style={[
+            styles.summary,
+            { backgroundColor: failed > 0 ? colors.dangerSoft : colors.successSoft },
+          ]}
+        >
           <Text variant="bodySemi" color={failed > 0 ? colors.danger : colors.success}>
             {failed === 0
               ? `✅ ${passed}/${results.length} test geçti`

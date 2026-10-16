@@ -4,13 +4,7 @@
  */
 
 import React, { useState } from 'react';
-import {
-  View,
-  StyleSheet,
-  FlatList,
-  Pressable,
-  Alert,
-} from 'react-native';
+import { View, StyleSheet, FlatList, Pressable, Alert } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTheme } from '@/theme';
 import { GroupPalette } from '@/theme/tokens';
@@ -66,47 +60,39 @@ export default function GroupDetailScreen() {
       return;
     }
 
-    Alert.alert(
-      'Başka Gruba Taşı',
-      'Hangi gruba taşınsın?',
-      [
-        ...otherGroups.map((g) => ({
-          text: `${g.emoji} ${g.name}`,
-          onPress: async () => {
-            await moveStudents.mutateAsync({
-              studentIds: Array.from(selectedIds),
-              groupId: g.id,
-            });
-            clearSelection();
-            refetch();
-          },
-        })),
-        { text: tr.common.cancel, style: 'cancel' as const },
-      ],
-    );
+    Alert.alert('Başka Gruba Taşı', 'Hangi gruba taşınsın?', [
+      ...otherGroups.map((g) => ({
+        text: `${g.emoji} ${g.name}`,
+        onPress: async () => {
+          await moveStudents.mutateAsync({
+            studentIds: Array.from(selectedIds),
+            groupId: g.id,
+          });
+          clearSelection();
+          refetch();
+        },
+      })),
+      { text: tr.common.cancel, style: 'cancel' as const },
+    ]);
   };
 
   const handleSetInactive = () => {
-    Alert.alert(
-      'Pasife Al',
-      `${selectedIds.size} talebe pasif yapılacak. Devam?`,
-      [
-        { text: tr.common.cancel, style: 'cancel' },
-        {
-          text: 'Pasife Al',
-          style: 'destructive',
-          onPress: async () => {
-            await Promise.all(
-              Array.from(selectedIds).map((sid) =>
-                setActive.mutateAsync({ id: sid, isActive: false }),
-              ),
-            );
-            clearSelection();
-            refetch();
-          },
+    Alert.alert('Pasife Al', `${selectedIds.size} talebe pasif yapılacak. Devam?`, [
+      { text: tr.common.cancel, style: 'cancel' },
+      {
+        text: 'Pasife Al',
+        style: 'destructive',
+        onPress: async () => {
+          await Promise.all(
+            Array.from(selectedIds).map((sid) =>
+              setActive.mutateAsync({ id: sid, isActive: false }),
+            ),
+          );
+          clearSelection();
+          refetch();
         },
-      ],
-    );
+      },
+    ]);
   };
 
   // ─── Render student item ──────────────────────────────────────────────────
@@ -153,26 +139,23 @@ export default function GroupDetailScreen() {
               ]}
             >
               {isSelected && (
-                <Text variant="captionSemi" color={colors.white}>✓</Text>
+                <Text variant="captionSemi" color={colors.white}>
+                  ✓
+                </Text>
               )}
             </View>
           )}
-          <Avatar
-            name={fullName}
-            emoji={item.avatar ?? undefined}
-            color={colorItem.bg}
-            size="md"
-          />
+          <Avatar name={fullName} emoji={item.avatar ?? undefined} color={colorItem.bg} size="md" />
           <View style={{ marginLeft: spacing.md, flex: 1 }}>
             <Text variant="bodySemi" color={item.isActive ? colors.ink : colors.muted}>
               {fullName}
             </Text>
             {item.grade ? (
-              <Text variant="caption" color={colors.muted}>{item.grade}. sınıf</Text>
+              <Text variant="caption" color={colors.muted}>
+                {item.grade}. sınıf
+              </Text>
             ) : null}
-            {!item.isActive && (
-              <Badge label="Pasif" variant="neutral" />
-            )}
+            {!item.isActive && <Badge label="Pasif" variant="neutral" />}
           </View>
         </View>
         {/* 📖 Okuma ve ⭐ Puan kısayolları */}
@@ -195,11 +178,15 @@ export default function GroupDetailScreen() {
               </Pressable>
             </View>
           )}
-          <Text variant="caption" color={colors.muted}>—</Text>
+          <Text variant="caption" color={colors.muted}>
+            —
+          </Text>
         </View>
       </Pressable>
     );
   };
+
+  const ITEM_HEIGHT = 84; // 44 avatar + 32 padding + 8 margin
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg }}>
@@ -218,11 +205,7 @@ export default function GroupDetailScreen() {
             accessibilityLabel={tr.common.back}
           />
           <View style={{ flex: 1, marginHorizontal: spacing.md }}>
-            <Text
-              variant="heading"
-              style={{ color: colorItem.text }}
-              numberOfLines={1}
-            >
+            <Text variant="heading" style={{ color: colorItem.text }} numberOfLines={1}>
               {group?.emoji} {group?.name}
             </Text>
             <Text variant="caption" style={{ color: colorItem.text }}>
@@ -262,15 +245,25 @@ export default function GroupDetailScreen() {
         >
           <View
             style={{
-              width: 18, height: 18, borderRadius: 4,
-              borderWidth: 1.5, borderColor: colorItem.text,
+              width: 18,
+              height: 18,
+              borderRadius: 4,
+              borderWidth: 1.5,
+              borderColor: colorItem.text,
               backgroundColor: showInactive ? colorItem.text : 'transparent',
-              alignItems: 'center', justifyContent: 'center',
+              alignItems: 'center',
+              justifyContent: 'center',
             }}
           >
-            {showInactive && <Text variant="caption" color={colorItem.bg}>✓</Text>}
+            {showInactive && (
+              <Text variant="caption" color={colorItem.bg}>
+                ✓
+              </Text>
+            )}
           </View>
-          <Text variant="caption" style={{ color: colorItem.text }}>Pasifleri göster</Text>
+          <Text variant="caption" style={{ color: colorItem.text }}>
+            Pasifleri göster
+          </Text>
         </Pressable>
 
         {/* Grup okuma girişi butonu */}
@@ -289,6 +282,14 @@ export default function GroupDetailScreen() {
         data={students}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
+        getItemLayout={(_, index) => ({
+          length: ITEM_HEIGHT,
+          offset: ITEM_HEIGHT * index,
+          index,
+        })}
+        initialNumToRender={15}
+        maxToRenderPerBatch={10}
+        windowSize={5}
         contentContainerStyle={{
           padding: spacing.base,
           paddingBottom: 100,
@@ -335,28 +336,15 @@ export default function GroupDetailScreen() {
               variant="secondary"
               size="sm"
               onPress={() => {
-                router.push(`/points/give?studentIds=${Array.from(selectedIds).join(',')}&groupId=${id}`);
+                router.push(
+                  `/points/give?studentIds=${Array.from(selectedIds).join(',')}&groupId=${id}`,
+                );
                 clearSelection();
               }}
             />
-            <Button
-              label="Gruba Taşı"
-              variant="secondary"
-              size="sm"
-              onPress={handleMoveToGroup}
-            />
-            <Button
-              label="Pasife Al"
-              variant="danger"
-              size="sm"
-              onPress={handleSetInactive}
-            />
-            <Button
-              label={tr.common.cancel}
-              variant="ghost"
-              size="sm"
-              onPress={clearSelection}
-            />
+            <Button label="Gruba Taşı" variant="secondary" size="sm" onPress={handleMoveToGroup} />
+            <Button label="Pasife Al" variant="danger" size="sm" onPress={handleSetInactive} />
+            <Button label={tr.common.cancel} variant="ghost" size="sm" onPress={clearSelection} />
           </View>
         </View>
       )}

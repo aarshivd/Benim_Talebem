@@ -5,14 +5,7 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import {
-  View,
-  StyleSheet,
-  KeyboardAvoidingView,
-  Platform,
-  Alert,
-  Pressable,
-} from 'react-native';
+import { View, StyleSheet, KeyboardAvoidingView, Platform, Alert, Pressable } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -21,7 +14,13 @@ import { z } from 'zod/v4';
 import { useTheme } from '@/theme';
 import { AvatarEmojis } from '@/theme/tokens';
 import { Screen, Text, Button, Input, ChipGroup, EmojiPicker, Avatar } from '@/components/ui';
-import { useStudent, useCreateStudent, useUpdateStudent, useDeleteStudent, useStudents } from '@/features/students/hooks';
+import {
+  useStudent,
+  useCreateStudent,
+  useUpdateStudent,
+  useDeleteStudent,
+  useStudents,
+} from '@/features/students/hooks';
 import { useGroups } from '@/features/groups/hooks';
 import tr from '@/i18n/tr';
 
@@ -159,7 +158,8 @@ export default function StudentFormScreen() {
     value: g.id,
   }));
 
-  const fullNamePreview = [watchedFirstName, watchedLastName].filter(Boolean).join(' ') || 'ÖN İZLEME';
+  const fullNamePreview =
+    [watchedFirstName, watchedLastName].filter(Boolean).join(' ') || 'ÖN İZLEME';
 
   return (
     <>
@@ -167,11 +167,7 @@ export default function StudentFormScreen() {
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
-        <Screen
-          title={isEdit ? 'Talebeyi Düzenle' : 'Talebe Ekle'}
-          showBack
-          scroll
-        >
+        <Screen title={isEdit ? 'Talebeyi Düzenle' : 'Talebe Ekle'} showBack scroll>
           <View style={[styles.form, { gap: spacing.lg }]}>
             {/* Avatar önizleme */}
             <View style={styles.avatarPreview}>
@@ -179,11 +175,7 @@ export default function StudentFormScreen() {
                 onPress={() => setEmojiPickerVisible(true)}
                 accessibilityLabel={tr.a11y.selectEmoji}
               >
-                <Avatar
-                  name={fullNamePreview}
-                  emoji={watchedAvatar || undefined}
-                  size="xl"
-                />
+                <Avatar name={fullNamePreview} emoji={watchedAvatar || undefined} size="xl" />
               </Pressable>
               <Text variant="caption" color={colors.muted} style={{ marginTop: spacing.sm }}>
                 Avatar seçmek için dokun
@@ -226,7 +218,9 @@ export default function StudentFormScreen() {
             {/* Grup seçimi */}
             {groupOptions.length > 0 && (
               <View>
-                <Text variant="label" style={{ marginBottom: spacing.sm }}>Grup</Text>
+                <Text variant="label" style={{ marginBottom: spacing.sm }}>
+                  Grup
+                </Text>
                 <Controller
                   control={control}
                   name="groupId"
@@ -288,12 +282,7 @@ export default function StudentFormScreen() {
 
             {/* Sil */}
             {isEdit && (
-              <Button
-                label={tr.common.delete}
-                variant="danger"
-                onPress={handleDelete}
-                fullWidth
-              />
+              <Button label={tr.common.delete} variant="danger" onPress={handleDelete} fullWidth />
             )}
           </View>
         </Screen>

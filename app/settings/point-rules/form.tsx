@@ -13,8 +13,7 @@ import { useTheme } from '@/theme';
 import { Screen, Text, Button, Input, ChipGroup, EmojiPicker } from '@/components/ui';
 import { usePointRule, useCreatePointRule, useUpdatePointRule } from '@/features/points/hooks';
 import { useQuery } from '@tanstack/react-query';
-import { db } from '@/db/client';
-import { getAllSettings } from '@/db/repositories/settings';
+import { useSettings } from '@/features/settings/hooks';
 import tr from '@/i18n/tr';
 
 // Zod şeması component içinde oluşturulmalı çünkü ayarlara göre değişiyor.
@@ -25,15 +24,13 @@ export default function PointRuleFormScreen() {
   const isEdit = !!id;
   const { spacing, colors, radius } = useTheme();
 
-  const { data: settings } = useQuery({
-    queryKey: ['settings'],
-    queryFn: () => getAllSettings(db),
-  });
+  const { data: settings } = useSettings();
   const allowNegative = settings?.allow_negative_points ?? false;
 
   const schema = z.object({
     name: z.string().min(1, tr.validation.required).max(100),
-    points: z.string()
+    points: z
+      .string()
       .min(1, tr.validation.required)
       .refine(
         (val) => {
@@ -44,7 +41,7 @@ export default function PointRuleFormScreen() {
           if (num < -100 || num > 100) return false;
           return true;
         },
-        { message: allowNegative ? '-100 ile 100 arası (0 hariç)' : '1 ile 100 arası' }
+        { message: allowNegative ? '-100 ile 100 arası (0 hariç)' : '1 ile 100 arası' },
       ),
     category: z.enum(['soru', 'davranis', 'gorev', 'ozel']),
     icon: z.string().min(1, 'İkon seçilmeli'),
@@ -56,7 +53,14 @@ export default function PointRuleFormScreen() {
   const createRule = useCreatePointRule();
   const updateRule = useUpdatePointRule();
 
-  const { control, handleSubmit, reset, setValue, watch, formState: { errors, isSubmitting } } = useForm<FormValues>({
+  const {
+    control,
+    handleSubmit,
+    reset,
+    setValue,
+    watch,
+    formState: { errors, isSubmitting },
+  } = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: { name: '', points: '', category: 'soru', icon: '⭐' },
   });
@@ -101,22 +105,47 @@ export default function PointRuleFormScreen() {
   ];
 
   return (
-    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
       <Screen title={isEdit ? 'Kuralı Düzenle' : 'Yeni Kural'} showBack scroll>
         <View style={{ gap: spacing.lg, paddingBottom: 40 }}>
-          
           <View style={{ alignItems: 'center', marginBottom: spacing.sm }}>
-            <View style={{ width: 80, height: 80, borderRadius: radius.full, backgroundColor: colors.surface, justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: colors.border }}>
+            <View
+              style={{
+                width: 80,
+                height: 80,
+                borderRadius: radius.full,
+                backgroundColor: colors.surface,
+                justifyContent: 'center',
+                alignItems: 'center',
+                borderWidth: 1,
+                borderColor: colors.border,
+              }}
+            >
               <Text style={{ fontSize: 40 }}>{watchedIcon}</Text>
             </View>
-            <Button label="İkon Seç" variant="ghost" size="sm" onPress={() => setEmojiPickerVisible(true)} />
+            <Button
+              label="İkon Seç"
+              variant="ghost"
+              size="sm"
+              onPress={() => setEmojiPickerVisible(true)}
+            />
           </View>
 
           <Controller
             control={control}
             name="name"
             render={({ field }) => (
-              <Input label="Kural Adı" placeholder="ör. Derste soruyu bildi" value={field.value} onChangeText={field.onChange} error={errors.name?.message} autoFocus={!isEdit} />
+              <Input
+                label="Kural Adı"
+                placeholder="ör. Derste soruyu bildi"
+                value={field.value}
+                onChangeText={field.onChange}
+                error={errors.name?.message}
+                autoFocus={!isEdit}
+              />
             )}
           />
 
@@ -126,7 +155,7 @@ export default function PointRuleFormScreen() {
             render={({ field }) => (
               <Input
                 label="Puan"
-                placeholder={allowNegative ? "-100 ile 100 arası" : "1 ile 100 arası"}
+                placeholder={allowNegative ? '-100 ile 100 arası' : '1 ile 100 arası'}
                 value={field.value}
                 onChangeText={field.onChange}
                 error={errors.points?.message}
@@ -140,19 +169,51 @@ export default function PointRuleFormScreen() {
             name="category"
             render={({ field }) => (
               <View>
-                <Text variant="label" style={{ marginBottom: spacing.sm }}>Kategori</Text>
-                <ChipGroup options={CATEGORY_OPTIONS} selected={field.value} onSelect={field.onChange} />
-                {errors.category && <Text variant="caption" color={colors.danger}>{errors.category.message}</Text>}
+                <Text variant="label" style={{ marginBottom: spacing.sm }}>
+                  Kategori
+                </Text>
+                <ChipGroup
+                  options={CATEGORY_OPTIONS}
+                  selected={field.value}
+                  onSelect={field.onChange}
+                />
+                {errors.category && (
+                  <Text variant="caption" color={colors.danger}>
+                    {errors.category.message}
+                  </Text>
+                )}
               </View>
             )}
           />
 
-          <Button label={isSubmitting ? tr.common.saving : tr.common.save} onPress={handleSubmit(onSubmit)} disabled={isSubmitting} fullWidth />
+          <Button
+            label={isSubmitting ? tr.common.saving : tr.common.save}
+            onPress={handleSubmit(onSubmit)}
+            disabled={isSubmitting}
+            fullWidth
+          />
         </View>
 
         <EmojiPicker
           visible={emojiPickerVisible}
-          emojis={['⭐', '👍', '🌟', '🏆', '💯', '👏', '🎯', '🚀', '💡', '📚', '🤝', '🧹', '🎨', '🧩', '🎈', '🎉']}
+          emojis={[
+            '⭐',
+            '👍',
+            '🌟',
+            '🏆',
+            '💯',
+            '👏',
+            '🎯',
+            '🚀',
+            '💡',
+            '📚',
+            '🤝',
+            '🧹',
+            '🎨',
+            '🧩',
+            '🎈',
+            '🎉',
+          ]}
           onClose={() => setEmojiPickerVisible(false)}
           onSelect={(emoji) => {
             setValue('icon', emoji);

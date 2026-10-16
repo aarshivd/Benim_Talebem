@@ -4,14 +4,7 @@
  */
 
 import React, { useState } from 'react';
-import {
-  View,
-  StyleSheet,
-  FlatList,
-  Alert,
-  ScrollView,
-  Pressable,
-} from 'react-native';
+import { View, StyleSheet, FlatList, Alert, ScrollView, Pressable } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 
 import { useTheme } from '@/theme';
@@ -20,8 +13,7 @@ import { Screen, Text, Button, Avatar, NumberStepper } from '@/components/ui';
 import { useGroups, useGroup } from '@/features/groups/hooks';
 import { useStudents } from '@/features/students/hooks';
 import { useStudentBooks } from '@/features/books/hooks';
-import { recordReading as recordReadingService } from '@/features/reading/service';
-import { db } from '@/db/client';
+import { useRecordReading } from '@/features/reading/hooks';
 import { todayLocal } from '@/domain';
 import tr from '@/i18n/tr';
 import type { Student } from '@/db/schema';
@@ -82,7 +74,11 @@ function StudentRow({
       style={[
         styles.row,
         {
-          backgroundColor: rowState.error ? colors.dangerSoft : rowState.saved ? colors.successSoft : colors.surface,
+          backgroundColor: rowState.error
+            ? colors.dangerSoft
+            : rowState.saved
+              ? colors.successSoft
+              : colors.surface,
           borderRadius: radius.lg,
           padding: spacing.base,
           marginBottom: spacing.sm,
@@ -90,13 +86,24 @@ function StudentRow({
       ]}
     >
       <View style={styles.rowLeft}>
-        <Avatar name={fullName} emoji={student.avatar ?? undefined} color={colorItem.bg} size="sm" />
+        <Avatar
+          name={fullName}
+          emoji={student.avatar ?? undefined}
+          color={colorItem.bg}
+          size="sm"
+        />
         <View style={{ marginLeft: spacing.sm, flex: 1 }}>
-          <Text variant="bodySemi" color={colors.ink} numberOfLines={1}>{fullName}</Text>
+          <Text variant="bodySemi" color={colors.ink} numberOfLines={1}>
+            {fullName}
+          </Text>
 
           {/* Birden çok aktif kitap varsa satır içi seçici */}
           {activeBooks.length > 1 && (
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 6, marginTop: 4 }}>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{ gap: 6, marginTop: 4 }}
+            >
               {activeBooks.map((sb) => (
                 <Pressable
                   key={sb.id}
@@ -111,13 +118,18 @@ function StudentRow({
                     })
                   }
                   style={{
-                    backgroundColor: rowState.studentBookId === sb.id ? colors.primarySoft : colors.border,
+                    backgroundColor:
+                      rowState.studentBookId === sb.id ? colors.primarySoft : colors.border,
                     borderRadius: radius.md,
                     paddingHorizontal: 8,
                     paddingVertical: 2,
                   }}
                 >
-                  <Text variant="caption" color={rowState.studentBookId === sb.id ? colors.primary : colors.muted} numberOfLines={1}>
+                  <Text
+                    variant="caption"
+                    color={rowState.studentBookId === sb.id ? colors.primary : colors.muted}
+                    numberOfLines={1}
+                  >
                     {sb.book?.title}
                   </Text>
                 </Pressable>
@@ -126,18 +138,26 @@ function StudentRow({
           )}
 
           {activeBooks.length === 0 && (
-            <Text variant="caption" color={colors.muted}>Aktif kitap yok — atlanacak</Text>
+            <Text variant="caption" color={colors.muted}>
+              Aktif kitap yok — atlanacak
+            </Text>
           )}
 
           {rowState.studentBookId && (
-            <Text variant="caption" color={colors.muted}>Şu an: {fromPage}. sayfa</Text>
+            <Text variant="caption" color={colors.muted}>
+              Şu an: {fromPage}. sayfa
+            </Text>
           )}
 
           {rowState.error && (
-            <Text variant="caption" color={colors.danger}>{rowState.error}</Text>
+            <Text variant="caption" color={colors.danger}>
+              {rowState.error}
+            </Text>
           )}
           {rowState.saved && (
-            <Text variant="caption" color={colors.success}>✓ Kaydedildi</Text>
+            <Text variant="caption" color={colors.success}>
+              ✓ Kaydedildi
+            </Text>
           )}
         </View>
       </View>
@@ -153,7 +173,9 @@ function StudentRow({
             step={1}
           />
           {hasPagesEntered && (
-            <Text variant="caption" color={colors.success}>+{rowState.toPage - fromPage} s.</Text>
+            <Text variant="caption" color={colors.success}>
+              +{rowState.toPage - fromPage} s.
+            </Text>
           )}
         </View>
       )}
@@ -177,12 +199,21 @@ export default function GroupReadingScreen() {
   const { data: group } = useGroup(selectedGroupId);
   const { data: students = [] } = useStudents(selectedGroupId, {});
 
+  const recordReadingMutation = useRecordReading();
+
   const handleRowChange = (studentId: string, state: RowState) => {
     setRows((prev) => ({ ...prev, [studentId]: state }));
   };
 
   const getRowState = (student: Student): RowState =>
-    rows[student.id] ?? { studentId: student.id, studentBookId: '', bookId: '', bookTotal: 0, fromPage: 0, toPage: 0 };
+    rows[student.id] ?? {
+      studentId: student.id,
+      studentBookId: '',
+      bookId: '',
+      bookTotal: 0,
+      fromPage: 0,
+      toPage: 0,
+    };
 
   const handleSaveAll = async () => {
     if (!selectedGroupId) return;
@@ -196,7 +227,7 @@ export default function GroupReadingScreen() {
       if (!row.studentBookId || !row.bookId || row.toPage <= row.fromPage) continue;
 
       try {
-        await recordReadingService(db, {
+        await recordReadingMutation.mutateAsync({
           studentId: student.id,
           bookId: row.bookId,
           bookTotalPages: row.bookTotal,
@@ -214,11 +245,9 @@ export default function GroupReadingScreen() {
     setSaving(false);
 
     if (savedCount > 0) {
-      Alert.alert(
-        'Kaydedildi',
-        `${savedCount} talebe için okuma kaydı oluşturuldu.`,
-        [{ text: tr.common.ok, onPress: () => router.back() }],
-      );
+      Alert.alert('Kaydedildi', `${savedCount} talebe için okuma kaydı oluşturuldu.`, [
+        { text: tr.common.ok, onPress: () => router.back() },
+      ]);
     } else {
       Alert.alert('Uyarı', 'Kaydedilecek geçerli satır bulunamadı.');
     }
@@ -242,7 +271,10 @@ export default function GroupReadingScreen() {
             return (
               <Pressable
                 key={g.id}
-                onPress={() => { setSelectedGroupId(g.id); setRows({}); }}
+                onPress={() => {
+                  setSelectedGroupId(g.id);
+                  setRows({});
+                }}
                 style={{
                   backgroundColor: active ? colorItem.bg : colors.surface,
                   borderColor: active ? colorItem.border : colors.border,
@@ -252,7 +284,10 @@ export default function GroupReadingScreen() {
                   paddingVertical: spacing.sm,
                 }}
               >
-                <Text variant="captionSemi" style={{ color: active ? colorItem.text : colors.muted }}>
+                <Text
+                  variant="captionSemi"
+                  style={{ color: active ? colorItem.text : colors.muted }}
+                >
                   {g.emoji} {g.name}
                 </Text>
               </Pressable>
@@ -286,7 +321,9 @@ export default function GroupReadingScreen() {
                 borderColor: active ? colors.primary : colors.border,
               }}
             >
-              <Text variant="captionSemi" color={active ? colors.white : colors.muted}>{label}</Text>
+              <Text variant="captionSemi" color={active ? colors.white : colors.muted}>
+                {label}
+              </Text>
             </Pressable>
           );
         })}
@@ -310,7 +347,9 @@ export default function GroupReadingScreen() {
           )}
           contentContainerStyle={{ paddingBottom: 120 }}
           ListEmptyComponent={
-            <Text variant="body" color={colors.muted} align="center">Bu grupta talebe yok.</Text>
+            <Text variant="body" color={colors.muted} align="center">
+              Bu grupta talebe yok.
+            </Text>
           }
         />
       )}

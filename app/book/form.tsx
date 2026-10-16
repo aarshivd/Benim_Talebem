@@ -34,7 +34,12 @@ export default function BookFormScreen() {
   const createBook = useCreateBook();
   const updateBook = useUpdateBook();
 
-  const { control, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<FormValues>({
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: { title: '', author: '', totalPages: '' },
   });
@@ -60,31 +65,58 @@ export default function BookFormScreen() {
   };
 
   return (
-    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
       <Screen title={isEdit ? 'Kitabı Düzenle' : 'Yeni Kitap'} showBack scroll>
         <View style={{ gap: spacing.lg, paddingBottom: 40 }}>
           <Controller
             control={control}
             name="title"
             render={({ field }) => (
-              <Input label="Kitap Adı" placeholder="ör. Küçük Prens" value={field.value} onChangeText={field.onChange} error={errors.title?.message} autoFocus={!isEdit} />
+              <Input
+                label="Kitap Adı"
+                placeholder="ör. Küçük Prens"
+                value={field.value}
+                onChangeText={field.onChange}
+                error={errors.title?.message}
+                autoFocus={!isEdit}
+              />
             )}
           />
           <Controller
             control={control}
             name="author"
             render={({ field }) => (
-              <Input label="Yazar (isteğe bağlı)" placeholder="ör. Antoine de Saint-Exupéry" value={field.value ?? ''} onChangeText={field.onChange} />
+              <Input
+                label="Yazar (isteğe bağlı)"
+                placeholder="ör. Antoine de Saint-Exupéry"
+                value={field.value ?? ''}
+                onChangeText={field.onChange}
+              />
             )}
           />
           <Controller
             control={control}
             name="totalPages"
             render={({ field }) => (
-              <Input label="Toplam Sayfa" placeholder="ör. 120" value={field.value} onChangeText={field.onChange} error={errors.totalPages?.message} keyboardType="numeric" />
+              <Input
+                label="Toplam Sayfa"
+                placeholder="ör. 120"
+                value={field.value}
+                onChangeText={field.onChange}
+                error={errors.totalPages?.message}
+                keyboardType="numeric"
+              />
             )}
           />
-          <Button label={isSubmitting ? tr.common.saving : tr.common.save} onPress={handleSubmit(onSubmit)} disabled={isSubmitting} fullWidth />
+          <Button
+            label={isSubmitting ? tr.common.saving : tr.common.save}
+            onPress={handleSubmit(onSubmit)}
+            disabled={isSubmitting}
+            fullWidth
+          />
         </View>
       </Screen>
     </KeyboardAvoidingView>

@@ -5,13 +5,7 @@
  */
 
 import React, { useState, useMemo } from 'react';
-import {
-  View,
-  StyleSheet,
-  KeyboardAvoidingView,
-  Platform,
-  Alert,
-} from 'react-native';
+import { View, StyleSheet, KeyboardAvoidingView, Platform, Alert } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 
 import { useTheme } from '@/theme';
@@ -51,9 +45,7 @@ export default function BulkStudentScreen() {
   const group = groups.find((g) => g.id === groupId);
 
   const parsedLines = useMemo<ParsedLine[]>(() => {
-    return rawText
-      .split('\n')
-      .map((raw, index) => ({ index, ...parseLine(raw) }));
+    return rawText.split('\n').map((raw, index) => ({ index, ...parseLine(raw) }));
   }, [rawText]);
 
   const validLines = parsedLines.filter((l) => !l.error && l.firstName);
@@ -124,7 +116,10 @@ export default function BulkStudentScreen() {
             ]}
           >
             <Text variant="caption" color={colors.primary}>
-              Her satıra bir talebe yazın: <Text variant="captionSemi" color={colors.primary}>Ad Soyad</Text>
+              Her satıra bir talebe yazın:{' '}
+              <Text variant="captionSemi" color={colors.primary}>
+                Ad Soyad
+              </Text>
               {'\n'}Örnek:{'\n'}Ali Veli{'\n'}Fatma Yılmaz
             </Text>
           </View>
@@ -143,7 +138,8 @@ export default function BulkStudentScreen() {
           {parsedLines.some((l) => l.raw.trim()) && (
             <View>
               <Text variant="label" style={{ marginBottom: spacing.sm }}>
-                Önizleme ({validLines.length}/{parsedLines.filter((l) => l.raw.trim()).length} geçerli)
+                Önizleme ({validLines.length}/{parsedLines.filter((l) => l.raw.trim()).length}{' '}
+                geçerli)
               </Text>
               {withDuplicates.map((line) => (
                 <View
@@ -151,9 +147,7 @@ export default function BulkStudentScreen() {
                   style={[
                     styles.previewRow,
                     {
-                      backgroundColor: line.isDuplicate
-                        ? colors.warningSoft
-                        : colors.successSoft,
+                      backgroundColor: line.isDuplicate ? colors.warningSoft : colors.successSoft,
                       borderRadius: radius.md,
                       paddingHorizontal: spacing.base,
                       paddingVertical: spacing.sm,
